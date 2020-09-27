@@ -51,8 +51,7 @@ namespace BlazorEventsTodo.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                // TODO : Fix
-                //endpoints.MapFallbackToFile("index.html");
+                endpoints.MapFallbackToFile("index.html");
             });
         }
     }

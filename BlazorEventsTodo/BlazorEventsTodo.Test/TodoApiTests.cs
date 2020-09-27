@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using BlazorEventsTodo.Todo;
+using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
@@ -16,23 +17,12 @@ namespace BlazorEventsTodo
             _factory = new WebApplicationFactory<Server.Startup>();
         }
 
-        private class TodoItemDto
-        {
-            public string Title { get; set; }
-            public Guid Id { get; set; }
-        }
-
-        private class CreateTodoDto
-        {
-            public string Title { get; set; }
-        }
-
         [Fact]
         public async Task Gets_empty_todos()
         {
             var client = _factory.CreateClient();
 
-            var response = await client.GetFromJsonAsync<List<TodoItemDto>>("/api/todo");
+            var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
 
             Assert.Empty(response);
         }
@@ -42,12 +32,12 @@ namespace BlazorEventsTodo
         {
             var client = _factory.CreateClient();
 
-            var newTodo = new CreateTodoDto() { Title = "New todo" };
+            var newTodo = new CreateTodo() { Title = "New todo" };
             var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
             postResponse.EnsureSuccessStatusCode();
             var newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
 
-            var response = await client.GetFromJsonAsync<List<TodoItemDto>>("/api/todo");
+            var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
 
             var createdTodo = Assert.Single(response);
             Assert.Equal(newTodoId, createdTodo.Id);

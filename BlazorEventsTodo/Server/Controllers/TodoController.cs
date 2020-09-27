@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BlazorEventsTodo.Todo;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,17 +7,6 @@ using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Server.Controllers
 {
-    public class TodoItem
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-    }
-
-    public class TodoRepository
-    {
-        public List<TodoItem> Items { get; } = new List<TodoItem>();
-    }
-
     [ApiController]
     [Route("api/[controller]")]
     public class TodoController : Controller
@@ -32,11 +22,6 @@ namespace BlazorEventsTodo.Server.Controllers
         public List<TodoItem> Get()
         {
             return _todoRepository.Items;
-        }
-
-        public class CreateTodo
-        {
-            public string Title { get; set; }
         }
 
         [HttpPost]

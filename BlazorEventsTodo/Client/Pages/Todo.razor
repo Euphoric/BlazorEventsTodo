@@ -1,32 +1,42 @@
 ﻿@page "/todo"
-@using BlazorEventsTodo.Shared
+@using BlazorEventsTodo.Todo
 @inject HttpClient Http
 
-<h3>Todo (@todos.Count(todo => !todo.IsDone))</h3>
+<h3>Todo</h3>
 
-<input placeholder="Something todo" @bind="newTodo" />
+<input placeholder="Something todo" @bind="newTodoTitle" />
 <button @onclick="AddTodo">Add todo</button>
 
 <ul>
     @foreach (var todo in todos)
     {
-    <li>
-        <input type="checkbox" @bind="todo.IsDone" />
-        <input @bind="todo.Title" />
-    </li>
+        <li>@todo.Title</li>
     }
 </ul>
 
 @code {
     private IList<TodoItem> todos = new List<TodoItem>();
-    private string newTodo;
+    private string newTodoTitle;
 
-    private void AddTodo()
+    protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrWhiteSpace(newTodo))
-        {
-            todos.Add(new TodoItem { Title = newTodo });
-            newTodo = string.Empty;
-        }
+        await RefreshTodoList();
+    }
+
+    private async Task RefreshTodoList()
+    {
+        todos = await Http.GetFromJsonAsync<List<TodoItem>>("/api/todo");
+    }
+
+    private async Task AddTodo()
+    {
+        if (string.IsNullOrWhiteSpace(newTodoTitle))
+            return;
+
+        var res = await Http.PostAsJsonAsync("/api/todo", new CreateTodo() { Title = newTodoTitle });
+        res.EnsureSuccessStatusCode();
+        newTodoTitle = string.Empty;
+
+        await RefreshTodoList();
     }
 }
