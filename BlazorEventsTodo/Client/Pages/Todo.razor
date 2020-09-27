@@ -6,6 +6,7 @@
 
 <input placeholder="Something todo" @bind="newTodoTitle" />
 <button @onclick="AddTodo">Add todo</button>
+<button @onclick="RefreshTodoList">Refresh</button>
 
 <ul>
     @foreach (var todo in todos)
