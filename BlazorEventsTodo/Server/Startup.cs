@@ -23,7 +23,8 @@ namespace BlazorEventsTodo.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddSingleton<TodoRepository>();
+            services.AddSingleton<EventStore>();
+            services.AddSingleton<TodoListProjection>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

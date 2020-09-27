@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Server.Controllers
 {
@@ -11,37 +9,39 @@ namespace BlazorEventsTodo.Server.Controllers
     [Route("api/[controller]")]
     public class TodoController : Controller
     {
-        private TodoRepository _todoRepository;
+        private EventStore _eventStore;
+        private TodoListProjection _todoListProjection;
 
-        public TodoController(TodoRepository todoRepository)
+        public TodoController(EventStore eventStore, TodoListProjection todoListProjection)
         {
-            _todoRepository = todoRepository;
+            _eventStore = eventStore;
+            _todoListProjection = todoListProjection;
         }
 
         [HttpGet]
-        public List<TodoItem> Get()
+        public IEnumerable<TodoItem> Get()
         {
-            return _todoRepository.Items;
+            return _todoListProjection.TodoList();
         }
 
         [HttpPost]
         public Guid Post(CreateTodo create)
         {
             var newId = Guid.NewGuid();
-            _todoRepository.Items.Add(new TodoItem() { Id = newId, Title = create.Title });
+            _eventStore.Store(new TodoItemCreated(newId, create.Title));
             return newId;
         }
 
         [HttpPost("{id}/finish")]
         public void Finish(Guid id)
         {
-            _todoRepository.Items.Single(x => x.Id == id).IsFinished = true;
+            _eventStore.Store(new TodoItemFinished(id));
         }
 
         [HttpPost("{id}/start")]
         public void Start(Guid id)
         {
-            _todoRepository.Items.Single(x => x.Id == id).IsFinished = false;
+            _eventStore.Store(new TodoItemStarted(id));
         }
     }
 }
