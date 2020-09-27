@@ -31,5 +31,17 @@ namespace BlazorEventsTodo.Server.Controllers
             _todoRepository.Items.Add(new TodoItem() { Id = newId, Title = create.Title });
             return newId;
         }
+
+        [HttpPost("{id}/finish")]
+        public void Finish(Guid id)
+        {
+            _todoRepository.Items.Single(x => x.Id == id).IsFinished = true;
+        }
+
+        [HttpPost("{id}/start")]
+        public void Start(Guid id)
+        {
+            _todoRepository.Items.Single(x => x.Id == id).IsFinished = false;
+        }
     }
 }

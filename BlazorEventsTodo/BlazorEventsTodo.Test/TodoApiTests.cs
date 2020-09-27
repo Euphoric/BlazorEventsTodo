@@ -43,5 +43,48 @@ namespace BlazorEventsTodo
             Assert.Equal(newTodoId, createdTodo.Id);
             Assert.Equal("New todo", createdTodo.Title);
         }
+
+        [Fact]
+        public async Task Toggles_todo_complete()
+        {
+            var client = _factory.CreateClient();
+
+            Guid newTodoId;
+            {
+                var newTodo = new CreateTodo() { Title = "New todo" };
+                var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
+                postResponse.EnsureSuccessStatusCode();
+                newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+            }
+
+            {
+                var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
+                var createdTodo = Assert.Single(response);
+                Assert.False(createdTodo.IsFinished);
+            }
+
+            {
+                var postResponse = await client.PostAsJsonAsync($"/api/todo/{newTodoId}/finish", "");
+                postResponse.EnsureSuccessStatusCode();
+            }
+
+            {
+                var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
+                var createdTodo = Assert.Single(response);
+                Assert.True(createdTodo.IsFinished);
+            }
+
+            {
+                var postResponse = await client.PostAsJsonAsync($"/api/todo/{newTodoId}/start", "");
+                postResponse.EnsureSuccessStatusCode();
+            }
+
+            {
+                var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
+                var createdTodo = Assert.Single(response);
+                Assert.False(createdTodo.IsFinished);
+            }
+        }
     }
 }
+
