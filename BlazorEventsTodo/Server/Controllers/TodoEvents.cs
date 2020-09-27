@@ -17,6 +17,16 @@ namespace BlazorEventsTodo.Server.Controllers
         public string Title { get; }
     }
 
+    public class TodoItemDeleted : IDomainEvent
+    {
+        public TodoItemDeleted(Guid id)
+        {
+            Id = id;
+        }
+
+        public Guid Id { get; }
+    }
+
     public class TodoItemFinished : IDomainEvent
     {
         public TodoItemFinished(Guid id)

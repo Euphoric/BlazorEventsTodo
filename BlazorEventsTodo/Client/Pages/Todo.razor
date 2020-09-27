@@ -14,6 +14,7 @@
         <li>
             <input type="checkbox" checked="@todo.IsFinished" @onchange="eventArgs => ToggleTaskFinished(todo.Id, (bool)eventArgs.Value)" />
             <span>@todo.Title</span>
+            <button @onclick="_ => DeleteTodo(todo.Id)">X</button>
         </li>
     }
 </ul>
@@ -40,6 +41,14 @@
         var res = await Http.PostAsJsonAsync("/api/todo", new CreateTodo() { Title = newTodoTitle });
         res.EnsureSuccessStatusCode();
         newTodoTitle = string.Empty;
+
+        await RefreshTodoList();
+    }
+
+    private async Task DeleteTodo(Guid id)
+    {
+        var res = await Http.DeleteAsync($"/api/todo/{id}");
+        res.EnsureSuccessStatusCode();
 
         await RefreshTodoList();
     }

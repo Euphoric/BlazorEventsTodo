@@ -32,16 +32,35 @@ namespace BlazorEventsTodo.Server.Controllers
             return newId;
         }
 
-        [HttpPost("{id}/finish")]
-        public void Finish(Guid id)
+        [HttpDelete("{id}")]
+        public void Delete(Guid id)
         {
+            _eventStore.Store(new TodoItemDeleted(id));
+        }
+
+        [HttpPost("{id}/finish")]
+        public IActionResult Finish(Guid id)
+        {
+            if (!_todoListProjection.TodoExists(id))
+            {
+                return BadRequest();
+            }
             _eventStore.Store(new TodoItemFinished(id));
+
+            return Ok();
         }
 
         [HttpPost("{id}/start")]
-        public void Start(Guid id)
+        public IActionResult Start(Guid id)
         {
+            if (!_todoListProjection.TodoExists(id))
+            {
+                return BadRequest();
+            }
+
             _eventStore.Store(new TodoItemStarted(id));
+
+            return Ok();
         }
     }
 }

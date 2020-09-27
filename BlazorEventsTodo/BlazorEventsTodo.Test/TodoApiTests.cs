@@ -85,6 +85,59 @@ namespace BlazorEventsTodo
                 Assert.False(createdTodo.IsFinished);
             }
         }
+
+        [Fact]
+        public async Task Deletes_todo()
+        {
+            var client = _factory.CreateClient();
+
+            Guid newTodoId;
+            {
+                var newTodo = new CreateTodo() { Title = "New todo" };
+                var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
+                postResponse.EnsureSuccessStatusCode();
+                newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+            }
+
+            {
+                var postResponse = await client.DeleteAsync($"/api/todo/{newTodoId}");
+                postResponse.EnsureSuccessStatusCode();
+            }
+
+            {
+                var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
+                Assert.Empty(response);
+            }
+        }
+
+        [Fact]
+        public async Task Cannot_start_or_finish_deleted_item()
+        {
+            var client = _factory.CreateClient();
+
+            Guid newTodoId;
+            {
+                var newTodo = new CreateTodo() { Title = "New todo" };
+                var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
+                postResponse.EnsureSuccessStatusCode();
+                newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+            }
+
+            {
+                var postResponse = await client.DeleteAsync($"/api/todo/{newTodoId}");
+                postResponse.EnsureSuccessStatusCode();
+            }
+
+            {
+                var postResponse = await client.PostAsJsonAsync($"/api/todo/{newTodoId}/finish", "");
+                Assert.Equal(System.Net.HttpStatusCode.BadRequest, postResponse.StatusCode);
+            }
+
+            {
+                var postResponse = await client.PostAsJsonAsync($"/api/todo/{newTodoId}/start", "");
+                Assert.Equal(System.Net.HttpStatusCode.BadRequest, postResponse.StatusCode);
+            }
+        }
     }
 }
 

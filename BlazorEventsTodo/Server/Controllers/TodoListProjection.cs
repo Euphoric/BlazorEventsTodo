@@ -15,6 +15,13 @@ namespace BlazorEventsTodo.Server.Controllers
 
         public IEnumerable<TodoItem> TodoList()
         {
+            Dictionary<Guid, TodoItem> items = CreateTodoTable();
+
+            return items.Values;
+        }
+
+        private Dictionary<Guid, TodoItem> CreateTodoTable()
+        {
             Dictionary<Guid, TodoItem> items = new Dictionary<Guid, TodoItem>();
 
             foreach (var evnt in _eventStore.Events)
@@ -23,6 +30,9 @@ namespace BlazorEventsTodo.Server.Controllers
                 {
                     case TodoItemCreated created:
                         items[created.Id] = new TodoItem() { Id = created.Id, Title = created.Title };
+                        break;
+                    case TodoItemDeleted deleted:
+                        items.Remove(deleted.Id);
                         break;
                     case TodoItemFinished finished:
                         items[finished.Id].IsFinished = true;
@@ -35,7 +45,12 @@ namespace BlazorEventsTodo.Server.Controllers
                 }
             }
 
-            return items.Values;
+            return items;
+        }
+
+        internal bool TodoExists(Guid id)
+        {
+            return CreateTodoTable().ContainsKey(id);
         }
     }
 }
