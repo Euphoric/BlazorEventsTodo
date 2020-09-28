@@ -1,9 +1,10 @@
-﻿using System;
+﻿using BlazorEventsTodo.EventStorage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BlazorEventsTodo.Server.Controllers
+namespace BlazorEventsTodo.Todo
 {
     public abstract class TodoItemDomainEvent : IDomainEvent
     {

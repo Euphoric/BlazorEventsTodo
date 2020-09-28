@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
-namespace BlazorEventsTodo.Server.Controllers
+namespace BlazorEventsTodo.EventStorage
 {
     public class DomainEventListenerWrapper<TTarget> : IDomainEventListener
     {

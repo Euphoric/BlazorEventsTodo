@@ -1,4 +1,4 @@
-﻿namespace BlazorEventsTodo.Server.Controllers
+﻿namespace BlazorEventsTodo.EventStorage
 {
     public interface IDomainEventListener
     {

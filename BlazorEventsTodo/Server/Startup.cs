@@ -1,4 +1,5 @@
-using BlazorEventsTodo.Server.Controllers;
+using BlazorEventsTodo.EventStorage;
+using BlazorEventsTodo.Todo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

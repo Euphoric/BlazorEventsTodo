@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BlazorEventsTodo.Server.Controllers
+namespace BlazorEventsTodo.EventStorage
 {
     public class DomainEventSender
     {

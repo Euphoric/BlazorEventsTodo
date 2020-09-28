@@ -1,9 +1,9 @@
-﻿using BlazorEventsTodo.Todo;
+﻿using BlazorEventsTodo.EventStorage;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace BlazorEventsTodo.Server.Controllers
+namespace BlazorEventsTodo.Todo
 {
     [ApiController]
     [Route("api/[controller]")]

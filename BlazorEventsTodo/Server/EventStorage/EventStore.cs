@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace BlazorEventsTodo.Server.Controllers
+namespace BlazorEventsTodo.EventStorage
 {
     /// <summary>
     /// Stores events.

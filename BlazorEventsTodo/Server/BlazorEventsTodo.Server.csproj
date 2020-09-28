@@ -20,6 +20,7 @@
 	<!--Remove afte update to .NET5 RC2-->
 	<PropertyGroup>
 		<PreBuildEvent>kill-port 9300</PreBuildEvent>
+		<RootNamespace>BlazorEventsTodo</RootNamespace>
 	</PropertyGroup>
 
 
