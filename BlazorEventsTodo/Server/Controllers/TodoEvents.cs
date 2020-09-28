@@ -5,7 +5,11 @@ using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Server.Controllers
 {
-    public class TodoItemCreated : IDomainEvent
+    public abstract class TodoItemDomainEvent : IDomainEvent
+    {
+    }
+
+    public class TodoItemCreated : TodoItemDomainEvent
     {
         public TodoItemCreated(Guid id, string title)
         {
@@ -17,7 +21,7 @@ namespace BlazorEventsTodo.Server.Controllers
         public string Title { get; }
     }
 
-    public class TodoItemDeleted : IDomainEvent
+    public class TodoItemDeleted : TodoItemDomainEvent
     {
         public TodoItemDeleted(Guid id)
         {
@@ -27,7 +31,7 @@ namespace BlazorEventsTodo.Server.Controllers
         public Guid Id { get; }
     }
 
-    public class TodoItemFinished : IDomainEvent
+    public class TodoItemFinished : TodoItemDomainEvent
     {
         public TodoItemFinished(Guid id)
         {
@@ -37,7 +41,7 @@ namespace BlazorEventsTodo.Server.Controllers
         public Guid Id { get; }
     }
 
-    public class TodoItemStarted : IDomainEvent
+    public class TodoItemStarted : TodoItemDomainEvent
     {
         public TodoItemStarted(Guid id)
         {
