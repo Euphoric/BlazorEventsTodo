@@ -9,10 +9,10 @@ namespace BlazorEventsTodo.Todo
     [Route("api/[controller]")]
     public class TodoController : Controller
     {
-        private EventStore _eventStore;
+        private IEventStore _eventStore;
         private TodoListProjection _todoListProjection;
 
-        public TodoController(EventStore eventStore, TodoListProjection todoListProjection)
+        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection)
         {
             _eventStore = eventStore;
             _todoListProjection = todoListProjection;

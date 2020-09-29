@@ -24,7 +24,7 @@ namespace BlazorEventsTodo.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddSingleton<EventStore>();
+            services.AddSingleton<IEventStore, EventStore>();
             services.AddSingleton<DomainEventSender>();
 
             services.AddSingleton<TodoListProjection>();
