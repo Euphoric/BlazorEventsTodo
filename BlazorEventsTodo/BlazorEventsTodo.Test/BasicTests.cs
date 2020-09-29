@@ -1,16 +1,14 @@
-using Microsoft.AspNetCore.Mvc.Testing;
-using System;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace BlazorEventsTodo
 {
     public class BasicTests
-        : IClassFixture<WebApplicationFactory<Server.Startup>>
+        : IClassFixture<TestServerFactory>
     {
-        private readonly WebApplicationFactory<Server.Startup> _factory;
+        private readonly TestServerFactory _factory;
 
-        public BasicTests(WebApplicationFactory<Server.Startup> factory)
+        public BasicTests(TestServerFactory factory)
         {
             _factory = factory;
         }

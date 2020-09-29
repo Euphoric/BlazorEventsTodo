@@ -10,11 +10,11 @@ namespace BlazorEventsTodo
 {
     public class TodoApiTests
     {
-        private readonly WebApplicationFactory<Server.Startup> _factory;
+        private readonly TestServerFactory _factory;
 
         public TodoApiTests()
         {
-            _factory = new WebApplicationFactory<Server.Startup>();
+            _factory = new TestServerFactory();
         }
 
         [Fact]
