@@ -14,7 +14,6 @@ namespace BlazorEventsTodo.EventStorage
     /// Requires EventStore v20.6.0, run with --dev parameter at the moment.
     /// </summary>
     /// <remarks>
-    /// TODO : Correct stream names.
     /// TODO : Correct event versions.
     /// ??? : Subscription delay.
     /// </remarks>
@@ -78,7 +77,7 @@ namespace BlazorEventsTodo.EventStorage
 
             var eventTypeString = _eventTypeLocator.GetTypeString(eventType);
             var evt = new EventData(Uuid.NewUuid(), eventTypeString, data, metadata);
-            var result = await _client.AppendToStreamAsync("newstream", StreamState.Any, new List<EventData>() { evt });
+            var result = await _client.AppendToStreamAsync(@event.AggregateKey, StreamState.Any, new List<EventData>() { evt });
             _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
         }
 

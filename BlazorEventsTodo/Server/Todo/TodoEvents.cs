@@ -1,58 +1,52 @@
 ﻿using BlazorEventsTodo.EventStorage;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Todo
 {
     public abstract class TodoItemDomainEvent : IDomainEvent
     {
+        public TodoItemDomainEvent(Guid id)
+        {
+            Id = id;
+        }
+
+        public string AggregateKey => $"todo-{Id}";
+
+        public Guid Id { get; }
     }
 
     [DomainEvent("todo-item-created")]
     public class TodoItemCreated : TodoItemDomainEvent
     {
         public TodoItemCreated(Guid id, string title)
+            :base(id)
         {
-            Id = id;
             Title = title;
         }
-
-        public Guid Id { get; }
         public string Title { get; }
     }
 
     [DomainEvent("todo-item-deleted")]
     public class TodoItemDeleted : TodoItemDomainEvent
     {
-        public TodoItemDeleted(Guid id)
+        public TodoItemDeleted(Guid id):base(id)
         {
-            Id = id;
         }
-
-        public Guid Id { get; }
     }
 
     [DomainEvent("todo-item-finished")]
     public class TodoItemFinished : TodoItemDomainEvent
     {
-        public TodoItemFinished(Guid id)
+        public TodoItemFinished(Guid id):base(id)
         {
-            Id = id;
         }
-
-        public Guid Id { get; }
     }
 
     [DomainEvent("todo-item-started")]
     public class TodoItemStarted : TodoItemDomainEvent
     {
-        public TodoItemStarted(Guid id)
+        public TodoItemStarted(Guid id):base(id)
         {
-            Id = id;
         }
-
-        public Guid Id { get; }
     }
 }

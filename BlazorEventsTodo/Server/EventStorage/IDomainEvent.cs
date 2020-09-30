@@ -1,4 +1,7 @@
 ﻿namespace BlazorEventsTodo.EventStorage
 {
-    public interface IDomainEvent { }
+    public interface IDomainEvent
+    {
+        string AggregateKey { get; }
+    }
 }
