@@ -10,6 +10,7 @@ namespace BlazorEventsTodo.Todo
     {
     }
 
+    [DomainEvent("todo-item-created")]
     public class TodoItemCreated : TodoItemDomainEvent
     {
         public TodoItemCreated(Guid id, string title)
@@ -22,6 +23,7 @@ namespace BlazorEventsTodo.Todo
         public string Title { get; }
     }
 
+    [DomainEvent("todo-item-deleted")]
     public class TodoItemDeleted : TodoItemDomainEvent
     {
         public TodoItemDeleted(Guid id)
@@ -32,6 +34,7 @@ namespace BlazorEventsTodo.Todo
         public Guid Id { get; }
     }
 
+    [DomainEvent("todo-item-finished")]
     public class TodoItemFinished : TodoItemDomainEvent
     {
         public TodoItemFinished(Guid id)
@@ -42,6 +45,7 @@ namespace BlazorEventsTodo.Todo
         public Guid Id { get; }
     }
 
+    [DomainEvent("todo-item-started")]
     public class TodoItemStarted : TodoItemDomainEvent
     {
         public TodoItemStarted(Guid id)

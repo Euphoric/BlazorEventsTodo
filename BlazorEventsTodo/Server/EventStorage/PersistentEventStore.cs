@@ -15,18 +15,22 @@ namespace BlazorEventsTodo.EventStorage
     /// </summary>
     /// <remarks>
     /// TODO : Correct stream names.
-    /// TODO : Correct event types.
     /// TODO : Correct event versions.
+    /// ??? : Subscription delay.
     /// </remarks>
     public class PersistentEventStore : IEventStore, IDisposable
     {
         private DomainEventSender _sender;
         private EventStoreClient _client;
+        private EventTypeLocator _eventTypeLocator;
+        private ILogger _logger;
 
         public PersistentEventStore(ILoggerFactory loggerFactory, DomainEventSender sender)
         {
             _sender = sender;
+            _logger = loggerFactory.CreateLogger<PersistentEventStore>();
             _client = CreateClientWithConnection(loggerFactory);
+            _eventTypeLocator = new EventTypeLocator();
         }
 
         public void Dispose()
@@ -37,6 +41,7 @@ namespace BlazorEventsTodo.EventStorage
         public async Task SubscribeClient()
         {
             await _client.SubscribeToAllAsync(HandleNewEvent);
+            _logger.LogInformation("Subscribed to events.");
         }
 
         private static EventStoreClient CreateClientWithConnection(ILoggerFactory loggerFactory)
@@ -63,22 +68,18 @@ namespace BlazorEventsTodo.EventStorage
             return new EventStoreClient(settingsWorkAround);
         }
 
-        private class Metadata
-        {
-            public string TypeFullName { get; set; }
-        }
-
         public async Task Store(IDomainEvent @event)
         {
             var eventType = @event.GetType();
             var dataJson = JsonSerializer.Serialize(@event, eventType);
             var data = Encoding.UTF8.GetBytes(dataJson);
 
-            var metadataJson = JsonSerializer.Serialize(new Metadata { TypeFullName = eventType.FullName });
-            var metadata = Encoding.UTF8.GetBytes(metadataJson);
+            var metadata = Encoding.UTF8.GetBytes("{}");
 
-            var evt = new EventData(Uuid.NewUuid(), "event-type", data, metadata);
-            await _client.AppendToStreamAsync("newstream", StreamState.Any, new List<EventData>() { evt });
+            var eventTypeString = _eventTypeLocator.GetTypeString(eventType);
+            var evt = new EventData(Uuid.NewUuid(), eventTypeString, data, metadata);
+            var result = await _client.AppendToStreamAsync("newstream", StreamState.Any, new List<EventData>() { evt });
+            _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
         }
 
         private Task HandleNewEvent(StreamSubscription subscription, ResolvedEvent evnt, CancellationToken token)
@@ -89,15 +90,16 @@ namespace BlazorEventsTodo.EventStorage
                 return Task.CompletedTask;
             }
 
-            var metadataJson = Encoding.UTF8.GetString(evnt.Event.Metadata.Span);
-            var metadata = JsonSerializer.Deserialize<Metadata>(metadataJson);
+            var eventType = _eventTypeLocator.GetClrType(evnt.Event.EventType);
 
-            if (string.IsNullOrEmpty(metadata.TypeFullName))
+            if (eventType == null)
             {
+                _logger.LogDebug("Received unknown type {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
                 return Task.CompletedTask;
             }
 
-            var eventType = Type.GetType(metadata.TypeFullName);
+            _logger.LogDebug("Processed event {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
+
             var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
             var data = JsonSerializer.Deserialize(dataJson, eventType);
 
