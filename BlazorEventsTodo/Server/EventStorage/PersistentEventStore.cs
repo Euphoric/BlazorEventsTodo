@@ -14,12 +14,11 @@ namespace BlazorEventsTodo.EventStorage
     /// Requires EventStore v20.6.0, run with --dev parameter at the moment.
     /// </summary>
     /// <remarks>
-    /// TODO : Dispose client.
     /// TODO : Correct stream names.
     /// TODO : Correct event types.
     /// TODO : Correct event versions.
     /// </remarks>
-    public class PersistentEventStore : IEventStore
+    public class PersistentEventStore : IEventStore, IDisposable
     {
         private DomainEventSender _sender;
         private EventStoreClient _client;
@@ -28,6 +27,11 @@ namespace BlazorEventsTodo.EventStorage
         {
             _sender = sender;
             _client = CreateClientWithConnection(loggerFactory);
+        }
+
+        public void Dispose()
+        {
+            _client.Dispose();
         }
 
         public async Task SubscribeClient()
@@ -61,7 +65,7 @@ namespace BlazorEventsTodo.EventStorage
 
         private class Metadata
         {
-            public string TypeFullName {get;set;}
+            public string TypeFullName { get; set; }
         }
 
         public async Task Store(IDomainEvent @event)
@@ -70,7 +74,7 @@ namespace BlazorEventsTodo.EventStorage
             var dataJson = JsonSerializer.Serialize(@event, eventType);
             var data = Encoding.UTF8.GetBytes(dataJson);
 
-            var metadataJson = JsonSerializer.Serialize(new Metadata{ TypeFullName = eventType.FullName });
+            var metadataJson = JsonSerializer.Serialize(new Metadata { TypeFullName = eventType.FullName });
             var metadata = Encoding.UTF8.GetBytes(metadataJson);
 
             var evt = new EventData(Uuid.NewUuid(), "event-type", data, metadata);
