@@ -15,6 +15,7 @@ namespace BlazorEventsTodo.EventStorage
     /// </summary>
     /// <remarks>
     /// TODO : Subscribe on server startup.
+    /// TODO : Dispose client.
     /// TODO : Projections are asynchronous now.
     /// TODO : Correct stream names.
     /// TODO : Correct event types.

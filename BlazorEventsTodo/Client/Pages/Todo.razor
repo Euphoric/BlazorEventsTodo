@@ -22,8 +22,16 @@
 @code {
     private IList<TodoItem> todos = new List<TodoItem>();
     private string newTodoTitle;
+    private System.Threading.Timer refreshTimer;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
+    {
+        refreshTimer = new System.Threading.Timer((System.Threading.TimerCallback)RefreshTick, null, TimeSpan.Zero, TimeSpan.FromSeconds(0.3));
+
+        return Task.CompletedTask;
+    }
+
+    private async void RefreshTick(object context)
     {
         await RefreshTodoList();
     }
@@ -31,6 +39,7 @@
     private async Task RefreshTodoList()
     {
         todos = await Http.GetFromJsonAsync<List<TodoItem>>("/api/todo");
+        StateHasChanged();
     }
 
     private async Task AddTodo()
@@ -41,16 +50,12 @@
         var res = await Http.PostAsJsonAsync("/api/todo", new CreateTodo() { Title = newTodoTitle });
         res.EnsureSuccessStatusCode();
         newTodoTitle = string.Empty;
-
-        await RefreshTodoList();
     }
 
     private async Task DeleteTodo(Guid id)
     {
         var res = await Http.DeleteAsync($"/api/todo/{id}");
         res.EnsureSuccessStatusCode();
-
-        await RefreshTodoList();
     }
 
     private async Task ToggleTaskFinished(Guid id, bool newValue)
@@ -59,7 +64,5 @@
 
         var res = await Http.PostAsJsonAsync($"/api/todo/{id}/{action}", "");
         res.EnsureSuccessStatusCode();
-
-        await RefreshTodoList();
     }
 }
