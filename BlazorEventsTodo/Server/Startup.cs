@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Server
 {
@@ -58,6 +60,16 @@ namespace BlazorEventsTodo.Server
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
             });
+        }
+
+        internal static async Task InitializeServices(IServiceProvider services)
+        {
+            var eventStore = services.GetService<IEventStore>();
+
+            if (eventStore is PersistentEventStore persistentEventStore)
+            {
+                await persistentEventStore.SubscribeClient();
+            }
         }
     }
 }

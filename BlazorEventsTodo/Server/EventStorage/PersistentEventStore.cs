@@ -14,7 +14,6 @@ namespace BlazorEventsTodo.EventStorage
     /// Requires EventStore v20.6.0, run with --dev parameter at the moment.
     /// </summary>
     /// <remarks>
-    /// TODO : Subscribe on server startup.
     /// TODO : Dispose client.
     /// TODO : Projections are asynchronous now.
     /// TODO : Correct stream names.
@@ -30,7 +29,11 @@ namespace BlazorEventsTodo.EventStorage
         {
             _sender = sender;
             _client = CreateClientWithConnection(loggerFactory);
-            _client.SubscribeToAllAsync(HandleNewEvent).Wait();
+        }
+
+        public async Task SubscribeClient()
+        {
+            await _client.SubscribeToAllAsync(HandleNewEvent);
         }
 
         private static EventStoreClient CreateClientWithConnection(ILoggerFactory loggerFactory)
