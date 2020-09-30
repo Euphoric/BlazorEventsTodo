@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Todo
 {
@@ -25,40 +26,40 @@ namespace BlazorEventsTodo.Todo
         }
 
         [HttpPost]
-        public Guid Post(CreateTodo create)
+        public async Task<Guid> Post(CreateTodo create)
         {
             var newId = Guid.NewGuid();
-            _eventStore.Store(new TodoItemCreated(newId, create.Title));
+            await _eventStore.Store(new TodoItemCreated(newId, create.Title));
             return newId;
         }
 
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            _eventStore.Store(new TodoItemDeleted(id));
+            await _eventStore.Store(new TodoItemDeleted(id));
         }
 
         [HttpPost("{id}/finish")]
-        public IActionResult Finish(Guid id)
+        public async Task<IActionResult> Finish(Guid id)
         {
             if (!_todoListProjection.TodoExists(id))
             {
                 return BadRequest();
             }
-            _eventStore.Store(new TodoItemFinished(id));
+            await _eventStore.Store(new TodoItemFinished(id));
 
             return Ok();
         }
 
         [HttpPost("{id}/start")]
-        public IActionResult Start(Guid id)
+        public async Task<IActionResult> Start(Guid id)
         {
             if (!_todoListProjection.TodoExists(id))
             {
                 return BadRequest();
             }
 
-            _eventStore.Store(new TodoItemStarted(id));
+            await _eventStore.Store(new TodoItemStarted(id));
 
             return Ok();
         }

@@ -15,7 +15,6 @@ namespace BlazorEventsTodo.EventStorage
     /// </summary>
     /// <remarks>
     /// TODO : Dispose client.
-    /// TODO : Projections are asynchronous now.
     /// TODO : Correct stream names.
     /// TODO : Correct event types.
     /// TODO : Correct event versions.
@@ -65,7 +64,7 @@ namespace BlazorEventsTodo.EventStorage
             public string TypeFullName {get;set;}
         }
 
-        public void Store(IDomainEvent @event)
+        public async Task Store(IDomainEvent @event)
         {
             var eventType = @event.GetType();
             var dataJson = JsonSerializer.Serialize(@event, eventType);
@@ -75,7 +74,7 @@ namespace BlazorEventsTodo.EventStorage
             var metadata = Encoding.UTF8.GetBytes(metadataJson);
 
             var evt = new EventData(Uuid.NewUuid(), "event-type", data, metadata);
-            _client.AppendToStreamAsync("newstream", StreamState.Any, new List<EventData>() { evt }).Wait();
+            await _client.AppendToStreamAsync("newstream", StreamState.Any, new List<EventData>() { evt });
         }
 
         private Task HandleNewEvent(StreamSubscription subscription, ResolvedEvent evnt, CancellationToken token)
