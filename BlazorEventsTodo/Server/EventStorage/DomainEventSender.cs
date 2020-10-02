@@ -11,7 +11,7 @@ namespace BlazorEventsTodo.EventStorage
             _domainEventListeners = domainEventListeners;
         }
 
-        public void SendEvent(IDomainEventContainer<IDomainEvent> evnt)
+        public void SendEvent(IDomainEvent<IDomainEventData> evnt)
         {
             foreach (var listener in _domainEventListeners)
             {

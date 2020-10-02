@@ -20,7 +20,7 @@ namespace BlazorEventsTodo.EventStorage
                 .ToImmutableList();
         }
 
-        public void Handle(IDomainEventContainer<IDomainEvent> evntContainer)
+        public void Handle(IDomainEvent<IDomainEventData> evntContainer)
         {
             foreach (var (eventType, methodInfo) in _supportedEvents)
             {

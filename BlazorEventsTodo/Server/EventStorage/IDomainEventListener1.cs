@@ -1,7 +1,7 @@
 ﻿namespace BlazorEventsTodo.EventStorage
 {
-    public interface IDomainEventListener<TEvent> where TEvent : IDomainEvent
+    public interface IDomainEventListener<TEvent> where TEvent : IDomainEventData
     {
-        void Handle(IDomainEventContainer<TEvent> evnt);
+        void Handle(IDomainEvent<TEvent> evnt);
     }
 }

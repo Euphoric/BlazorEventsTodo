@@ -2,6 +2,6 @@
 {
     public interface IDomainEventListener
     {
-        void Handle(IDomainEventContainer<IDomainEvent> evnt);
+        void Handle(IDomainEvent<IDomainEventData> evnt);
     }
 }

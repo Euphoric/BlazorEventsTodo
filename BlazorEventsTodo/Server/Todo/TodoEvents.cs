@@ -3,7 +3,7 @@ using System;
 
 namespace BlazorEventsTodo.Todo
 {
-    public abstract class TodoItemDomainEvent : IDomainEvent
+    public abstract class TodoItemDomainEvent : IDomainEventData
     {
         public TodoItemDomainEvent(Guid id)
         {
