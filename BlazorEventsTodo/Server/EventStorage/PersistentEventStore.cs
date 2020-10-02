@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -72,7 +71,7 @@ namespace BlazorEventsTodo.EventStorage
             var data = _eventFactory.Serialize(@event);
             var metadata = Encoding.UTF8.GetBytes("{}");
 
-            var evt = new EventData(Uuid.NewUuid(), @event.EventName, data, metadata);
+            var evt = new EventData(Uuid.FromGuid(@event.Id), @event.EventName, data, metadata);
             var result = await _client.AppendToStreamAsync(@event.AggregateKey, StreamState.Any, new List<EventData>() { evt });
             _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
         }
@@ -85,7 +84,7 @@ namespace BlazorEventsTodo.EventStorage
                 return Task.CompletedTask;
             }
 
-            var @event = _eventFactory.Deserialize(evnt.Event.EventType, evnt.Event.Data.Span);
+            var @event = _eventFactory.Deserialize(evnt.Event.EventId.ToGuid(), evnt.Event.EventType, evnt.Event.Data.Span);
 
             _logger.LogDebug("Processed event {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
 

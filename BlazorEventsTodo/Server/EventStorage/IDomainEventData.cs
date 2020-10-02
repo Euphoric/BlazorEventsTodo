@@ -1,4 +1,6 @@
-﻿namespace BlazorEventsTodo.EventStorage
+﻿using System;
+
+namespace BlazorEventsTodo.EventStorage
 {
     public interface IDomainEventData
     {
@@ -14,6 +16,7 @@
     public interface IDomainEvent<out TEvent>
         where TEvent : IDomainEventData
     {
+        Guid Id { get; }
         string AggregateKey { get; }
         string EventName { get; }
         TEvent Data { get; }

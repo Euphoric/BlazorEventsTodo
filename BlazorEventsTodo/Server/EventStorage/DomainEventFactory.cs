@@ -17,25 +17,27 @@ namespace BlazorEventsTodo.EventStorage
             where TEventData : IDomainEventData
         {
             var eventName = _eventTypeLocator.GetTypeString(eventData.GetType());
-            return new DomainEvent<TEventData>(eventData, eventName);
+            return new DomainEvent<TEventData>(Guid.NewGuid(), eventData, eventName);
         }
 
         private class DomainEvent<TData> : IDomainEvent<TData>
             where TData : IDomainEventData
         {
-            public DomainEvent(TData data, string eventName)
+            public DomainEvent(Guid id, TData data, string eventName)
             {
+                Id = id;
                 Data = data;
                 EventName = eventName;
             }
 
+            public Guid Id { get; }
             public TData Data { get; }
             public string EventName { get; }
 
             public string AggregateKey => Data.GetAggregateKey();
         }
 
-        public IDomainEvent<IDomainEventData> Deserialize(string eventName, ReadOnlySpan<byte> dataSpan)
+        public IDomainEvent<IDomainEventData> Deserialize(Guid id, string eventName, ReadOnlySpan<byte> dataSpan)
         {
             var eventType = _eventTypeLocator.GetClrType(eventName);
 
@@ -48,7 +50,7 @@ namespace BlazorEventsTodo.EventStorage
             var data = JsonSerializer.Deserialize(dataJson, eventType);
 
             var domainEventContainerType = typeof(DomainEvent<>).MakeGenericType(eventType);
-            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { data, eventName });
+            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, data, eventName });
         }
 
         public byte[] Serialize(IDomainEvent<IDomainEventData> @event)
