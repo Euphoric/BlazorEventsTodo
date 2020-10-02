@@ -8,9 +8,9 @@ namespace BlazorEventsTodo.Todo
     {
         Dictionary<Guid, TodoItem> _todoItems = new Dictionary<Guid, TodoItem>();
 
-        public void Handle(TodoItemDomainEvent evnt)
+        public void Handle(IDomainEventContainer<TodoItemDomainEvent> evntCont)
         {
-            switch (evnt)
+            switch (evntCont.Event)
             {
                 case TodoItemCreated created:
                     _todoItems[created.Id] = new TodoItem() { Id = created.Id, Title = created.Title };

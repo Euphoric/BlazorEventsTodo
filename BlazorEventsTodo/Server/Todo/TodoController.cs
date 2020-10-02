@@ -29,14 +29,14 @@ namespace BlazorEventsTodo.Todo
         public async Task<Guid> Post(CreateTodo create)
         {
             var newId = Guid.NewGuid();
-            await _eventStore.Store(new TodoItemCreated(newId, create.Title));
+            await _eventStore.Store(DomainEventContainer<IDomainEvent>.Create(new TodoItemCreated(newId, create.Title)));
             return newId;
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _eventStore.Store(new TodoItemDeleted(id));
+            await _eventStore.Store(DomainEventContainer<IDomainEvent>.Create(new TodoItemDeleted(id)));
         }
 
         [HttpPost("{id}/finish")]
@@ -46,7 +46,7 @@ namespace BlazorEventsTodo.Todo
             {
                 return BadRequest();
             }
-            await _eventStore.Store(new TodoItemFinished(id));
+            await _eventStore.Store(DomainEventContainer<IDomainEvent>.Create(new TodoItemFinished(id)));
 
             return Ok();
         }
@@ -59,7 +59,7 @@ namespace BlazorEventsTodo.Todo
                 return BadRequest();
             }
 
-            await _eventStore.Store(new TodoItemStarted(id));
+            await _eventStore.Store(DomainEventContainer<IDomainEvent>.Create(new TodoItemStarted(id)));
 
             return Ok();
         }

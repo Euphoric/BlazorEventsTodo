@@ -2,6 +2,6 @@
 {
     public interface IDomainEventListener<TEvent> where TEvent : IDomainEvent
     {
-        void Handle(TEvent evnt);
+        void Handle(IDomainEventContainer<TEvent> evnt);
     }
 }

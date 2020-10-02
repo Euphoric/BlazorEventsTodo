@@ -15,17 +15,18 @@ namespace BlazorEventsTodo.EventStorage
             _target = target;
             _supportedEvents = typeof(TTarget).GetInterfaces()
                 .Where(x => x.GetGenericTypeDefinition() == typeof(IDomainEventListener<>))
-                .Select(x => (x.GetGenericArguments()[0], x.GetMethod("Handle")))
+                .Select(x => x.GetMethod("Handle"))
+                .Select(x => (x.GetParameters()[0].ParameterType, x))
                 .ToImmutableList();
         }
 
-        public void Handle(IDomainEvent evnt)
+        public void Handle(IDomainEventContainer<IDomainEvent> evntContainer)
         {
             foreach (var (eventType, methodInfo) in _supportedEvents)
             {
-                if (eventType.IsAssignableFrom(evnt.GetType()))
+                if (eventType.IsAssignableFrom(evntContainer.GetType()))
                 {
-                    methodInfo.Invoke(_target, new object[] { evnt });
+                    methodInfo.Invoke(_target, new object[] { evntContainer });
                 }
             }
         }

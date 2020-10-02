@@ -67,8 +67,9 @@ namespace BlazorEventsTodo.EventStorage
             return new EventStoreClient(settingsWorkAround);
         }
 
-        public async Task Store(IDomainEvent @event)
+        public async Task Store(IDomainEventContainer<IDomainEvent> eventContainer)
         {
+            var @event = eventContainer.Event;
             var eventType = @event.GetType();
             var dataJson = JsonSerializer.Serialize(@event, eventType);
             var data = Encoding.UTF8.GetBytes(dataJson);
@@ -102,7 +103,7 @@ namespace BlazorEventsTodo.EventStorage
             var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
             var data = JsonSerializer.Deserialize(dataJson, eventType);
 
-            _sender.SendEvent((IDomainEvent)data);
+            _sender.SendEvent(DomainEventContainer<IDomainEvent>.Create((IDomainEvent)data));
 
             return Task.CompletedTask;
         }

@@ -5,12 +5,12 @@ namespace BlazorEventsTodo.EventStorage
 {
     public interface IEventStore
     {
-        public Task Store(IDomainEvent @event);
+        public Task Store(IDomainEventContainer<IDomainEvent> @event);
     }
 
     public class EventStore : IEventStore
     {
-        List<IDomainEvent> _events = new List<IDomainEvent>();
+        List<IDomainEventContainer<IDomainEvent>> _events = new List<IDomainEventContainer<IDomainEvent>>();
         private DomainEventSender _sender;
 
         public EventStore(DomainEventSender sender)
@@ -18,7 +18,7 @@ namespace BlazorEventsTodo.EventStorage
             _sender = sender;
         }
 
-        public Task Store(IDomainEvent @event)
+        public Task Store(IDomainEventContainer<IDomainEvent> @event)
         {
             _events.Add(@event);
             _sender.SendEvent(@event);
