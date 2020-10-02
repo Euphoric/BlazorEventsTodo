@@ -12,11 +12,13 @@ namespace BlazorEventsTodo.Todo
     {
         private IEventStore _eventStore;
         private TodoListProjection _todoListProjection;
+        private DomainEventFactory _eventFactory;
 
-        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection)
+        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection, DomainEventFactory eventFactory)
         {
             _eventStore = eventStore;
             _todoListProjection = todoListProjection;
+            _eventFactory = eventFactory;
         }
 
         [HttpGet]
@@ -29,14 +31,14 @@ namespace BlazorEventsTodo.Todo
         public async Task<Guid> Post(CreateTodo create)
         {
             var newId = Guid.NewGuid();
-            await _eventStore.Store(DomainEvent<IDomainEventData>.Create(new TodoItemCreated(newId, create.Title)));
+            await _eventStore.Store(_eventFactory.Create(new TodoItemCreated(newId, create.Title)));
             return newId;
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _eventStore.Store(DomainEvent<IDomainEventData>.Create(new TodoItemDeleted(id)));
+            await _eventStore.Store(_eventFactory.Create(new TodoItemDeleted(id)));
         }
 
         [HttpPost("{id}/finish")]
@@ -46,7 +48,7 @@ namespace BlazorEventsTodo.Todo
             {
                 return BadRequest();
             }
-            await _eventStore.Store(DomainEvent<IDomainEventData>.Create(new TodoItemFinished(id)));
+            await _eventStore.Store(_eventFactory.Create(new TodoItemFinished(id)));
 
             return Ok();
         }
@@ -59,7 +61,7 @@ namespace BlazorEventsTodo.Todo
                 return BadRequest();
             }
 
-            await _eventStore.Store(DomainEvent<IDomainEventData>.Create(new TodoItemStarted(id)));
+            await _eventStore.Store(_eventFactory.Create(new TodoItemStarted(id)));
 
             return Ok();
         }

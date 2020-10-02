@@ -28,6 +28,7 @@ namespace BlazorEventsTodo.Server
 
             services.AddSingleton<IEventStore, PersistentEventStore>();
             services.AddSingleton<DomainEventSender>();
+            services.AddSingleton<DomainEventFactory>();
 
             services.AddSingleton<TodoListProjection>();
             services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<TodoListProjection>>();

@@ -22,14 +22,16 @@ namespace BlazorEventsTodo.EventStorage
         private DomainEventSender _sender;
         private EventStoreClient _client;
         private EventTypeLocator _eventTypeLocator;
+        private DomainEventFactory _eventFactory;
         private ILogger _logger;
 
-        public PersistentEventStore(ILoggerFactory loggerFactory, DomainEventSender sender)
+        public PersistentEventStore(ILoggerFactory loggerFactory, DomainEventSender sender, DomainEventFactory eventFactory)
         {
             _sender = sender;
             _logger = loggerFactory.CreateLogger<PersistentEventStore>();
             _client = CreateClientWithConnection(loggerFactory);
             _eventTypeLocator = new EventTypeLocator();
+            _eventFactory = eventFactory;
         }
 
         public void Dispose()
@@ -103,7 +105,8 @@ namespace BlazorEventsTodo.EventStorage
             var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
             var data = JsonSerializer.Deserialize(dataJson, eventType);
 
-            _sender.SendEvent(DomainEvent<IDomainEventData>.Create((IDomainEventData)data));
+            var @event = _eventFactory.CreateFromBase((IDomainEventData)data);
+            _sender.SendEvent(@event);
 
             return Task.CompletedTask;
         }

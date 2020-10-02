@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BlazorEventsTodo.EventStorage
+﻿namespace BlazorEventsTodo.EventStorage
 {
     public interface IDomainEventData
     {
@@ -11,23 +9,5 @@ namespace BlazorEventsTodo.EventStorage
         where TEvent : IDomainEventData
     {
         TEvent Data { get; }
-    }
-
-    public class DomainEvent<TData> : IDomainEvent<TData>
-        where TData : IDomainEventData
-    {
-        public static IDomainEvent<IDomainEventData> Create(IDomainEventData @event)
-        {
-            var eventType = @event.GetType();
-            var domainEventContainerType = typeof(DomainEvent<>).MakeGenericType(eventType);
-            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { @event });
-        }
-
-        public DomainEvent(TData data)
-        {
-            Data = data;
-        }
-
-        public TData Data { get; }
     }
 }
