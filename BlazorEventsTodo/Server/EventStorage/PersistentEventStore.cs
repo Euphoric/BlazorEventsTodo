@@ -21,7 +21,6 @@ namespace BlazorEventsTodo.EventStorage
     {
         private DomainEventSender _sender;
         private EventStoreClient _client;
-        private EventTypeLocator _eventTypeLocator;
         private DomainEventFactory _eventFactory;
         private ILogger _logger;
 
@@ -30,7 +29,6 @@ namespace BlazorEventsTodo.EventStorage
             _sender = sender;
             _logger = loggerFactory.CreateLogger<PersistentEventStore>();
             _client = CreateClientWithConnection(loggerFactory);
-            _eventTypeLocator = new EventTypeLocator();
             _eventFactory = eventFactory;
         }
 
@@ -69,17 +67,12 @@ namespace BlazorEventsTodo.EventStorage
             return new EventStoreClient(settingsWorkAround);
         }
 
-        public async Task Store(IDomainEvent<IDomainEventData> eventContainer)
+        public async Task Store(IDomainEvent<IDomainEventData> @event)
         {
-            var @event = eventContainer.Data;
-            var eventType = @event.GetType();
-            var dataJson = JsonSerializer.Serialize(@event, eventType);
-            var data = Encoding.UTF8.GetBytes(dataJson);
-
+            var data = _eventFactory.Serialize(@event);
             var metadata = Encoding.UTF8.GetBytes("{}");
 
-            var eventTypeString = _eventTypeLocator.GetTypeString(eventType);
-            var evt = new EventData(Uuid.NewUuid(), eventTypeString, data, metadata);
+            var evt = new EventData(Uuid.NewUuid(), @event.EventName, data, metadata);
             var result = await _client.AppendToStreamAsync(@event.AggregateKey, StreamState.Any, new List<EventData>() { evt });
             _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
         }
@@ -92,20 +85,10 @@ namespace BlazorEventsTodo.EventStorage
                 return Task.CompletedTask;
             }
 
-            var eventType = _eventTypeLocator.GetClrType(evnt.Event.EventType);
-
-            if (eventType == null)
-            {
-                _logger.LogDebug("Received unknown type {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
-                return Task.CompletedTask;
-            }
+            var @event = _eventFactory.Deserialize(evnt.Event.EventType, evnt.Event.Data.Span);
 
             _logger.LogDebug("Processed event {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
 
-            var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
-            var data = JsonSerializer.Deserialize(dataJson, eventType);
-
-            var @event = _eventFactory.CreateFromBase((IDomainEventData)data);
             _sender.SendEvent(@event);
 
             return Task.CompletedTask;

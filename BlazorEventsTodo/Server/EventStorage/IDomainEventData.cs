@@ -8,6 +8,8 @@
     public interface IDomainEvent<out TEvent>
         where TEvent : IDomainEventData
     {
+        string AggregateKey { get; }
+        string EventName { get; }
         TEvent Data { get; }
     }
 }
