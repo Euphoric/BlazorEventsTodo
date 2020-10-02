@@ -68,7 +68,8 @@ namespace BlazorEventsTodo.EventStorage
 
         public async Task Store(IDomainEvent<IDomainEventData> @event)
         {
-            var data = _eventFactory.Serialize(@event);
+            var dataJson = _eventFactory.SerializeToData(@event);
+            var data = Encoding.UTF8.GetBytes(dataJson);
             var metadata = Encoding.UTF8.GetBytes("{}");
 
             var evt = new EventData(Uuid.FromGuid(@event.Id), @event.EventName, data, metadata);
@@ -84,7 +85,8 @@ namespace BlazorEventsTodo.EventStorage
                 return Task.CompletedTask;
             }
 
-            var @event = _eventFactory.Deserialize(evnt.Event.EventId.ToGuid(), evnt.Event.EventType, evnt.Event.Data.Span);
+            var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
+            var @event = _eventFactory.DeserializeFromData(evnt.Event.EventId.ToGuid(), evnt.Event.EventType, dataJson);
 
             _logger.LogDebug("Processed event {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
 

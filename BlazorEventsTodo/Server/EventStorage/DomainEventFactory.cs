@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Text.Json;
 
 namespace BlazorEventsTodo.EventStorage
@@ -37,7 +36,7 @@ namespace BlazorEventsTodo.EventStorage
             public string AggregateKey => Data.GetAggregateKey();
         }
 
-        public IDomainEvent<IDomainEventData> Deserialize(Guid id, string eventName, ReadOnlySpan<byte> dataSpan)
+        public IDomainEvent<IDomainEventData> DeserializeFromData(Guid id, string eventName, string dataJson)
         {
             var eventType = _eventTypeLocator.GetClrType(eventName);
 
@@ -46,19 +45,17 @@ namespace BlazorEventsTodo.EventStorage
                 throw new Exception("Unknown event name: " + eventName);
             }
 
-            var dataJson = Encoding.UTF8.GetString(dataSpan);
             var data = JsonSerializer.Deserialize(dataJson, eventType);
 
             var domainEventContainerType = typeof(DomainEvent<>).MakeGenericType(eventType);
             return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, data, eventName });
         }
 
-        public byte[] Serialize(IDomainEvent<IDomainEventData> @event)
+        public string SerializeToData(IDomainEvent<IDomainEventData> @event)
         {
             var eventData = @event.Data;
             var eventType = eventData.GetType();
-            var dataJson = JsonSerializer.Serialize(eventData, eventType);
-            return Encoding.UTF8.GetBytes(dataJson);
+            return JsonSerializer.Serialize(eventData, eventType);
         }
     }
 }
