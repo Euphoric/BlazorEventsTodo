@@ -10,7 +10,10 @@ namespace BlazorEventsTodo.Todo
             Id = id;
         }
 
-        public string AggregateKey => $"todo-{Id}";
+        public string GetAggregateKey()
+        {
+            return $"todo-{Id}";
+        }
 
         public Guid Id { get; }
     }

@@ -32,7 +32,7 @@ namespace BlazorEventsTodo.EventStorage
             public TData Data { get; }
             public string EventName { get; }
 
-            public string AggregateKey => Data.AggregateKey;
+            public string AggregateKey => Data.GetAggregateKey();
         }
 
         public IDomainEvent<IDomainEventData> Deserialize(string eventName, ReadOnlySpan<byte> dataSpan)

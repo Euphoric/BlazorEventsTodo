@@ -2,7 +2,13 @@
 {
     public interface IDomainEventData
     {
-        string AggregateKey { get; }
+        /// <summary>
+        /// Returns domain's aggregate key.
+        /// </summary>
+        /// <remarks>
+        /// Keep as method so it is not serialized.
+        /// </remarks>
+        string GetAggregateKey();
     }
 
     public interface IDomainEvent<out TEvent>
