@@ -37,7 +37,7 @@ namespace BlazorEventsTodo.Todo
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+            var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
             var evnt = aggregate.Delete();
             await _eventStore.Store(evnt);
         }
@@ -47,7 +47,7 @@ namespace BlazorEventsTodo.Todo
         {
             try
             {
-                var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
                 var evnt = aggregate.Finish();
                 await _eventStore.Store(evnt);
             }
@@ -64,7 +64,7 @@ namespace BlazorEventsTodo.Todo
         {
             try
             {
-                var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
                 var evnt = aggregate.Start();
                 await _eventStore.Store(evnt);
             }

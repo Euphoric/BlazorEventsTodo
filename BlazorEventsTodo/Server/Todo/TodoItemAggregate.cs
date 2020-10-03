@@ -1,7 +1,5 @@
 ﻿using BlazorEventsTodo.EventStorage;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlazorEventsTodo.Todo
 {
@@ -9,31 +7,30 @@ namespace BlazorEventsTodo.Todo
     {
         #region Rebuild
 
-        public static TodoItemAggregate Rebuild(IEnumerable<IDomainEvent<TodoItemDomainEvent>> events)
+        public static TodoItemAggregate Initialize(IDomainEvent<TodoItemCreated> createdEvent)
         {
-            return events.Aggregate((TodoItemAggregate)null, Apply);
+            return new TodoItemAggregate(createdEvent.Data.Id, createdEvent.Version, createdEvent.Data.Title, false, false);
         }
 
-        private static TodoItemAggregate Apply(TodoItemAggregate aggr, IDomainEvent<TodoItemDomainEvent> evnt)
+        public TodoItemAggregate Update(IDomainEvent<TodoItemDomainEvent> evnt)
         {
+            TodoItemAggregate aggr = this;
             switch (evnt.Data)
             {
-                case TodoItemCreated created:
-                    return new TodoItemAggregate(created.Id, evnt.Version, created.Title, false, false);
                 case TodoItemDeleted:
-                    return aggr with { Version = evnt.Version, IsDeleted = true };
+                    aggr = aggr with { IsDeleted = true };
+                    break;
                 case TodoItemFinished:
-                    return aggr with { Version = evnt.Version, IsFinished = true };
+                    aggr = aggr with { IsFinished = true };
+                    break;
                 case TodoItemStarted:
-                    return aggr with { Version = evnt.Version, IsFinished = false };
+                    aggr = aggr with { IsFinished = false };
+                    break;
+                default:
+                    throw new NotSupportedException("Unknown event type.");
             }
 
-            throw new NotSupportedException("Unknown event type.");
-        }
-
-        public TodoItemAggregate Update(IDomainEvent<TodoItemDomainEvent> domainEvent)
-        {
-            return Apply(this, domainEvent);
+            return aggr with { Version = evnt.Version };
         }
 
         #endregion
