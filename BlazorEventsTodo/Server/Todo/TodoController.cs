@@ -29,16 +29,16 @@ namespace BlazorEventsTodo.Todo
         [HttpPost]
         public async Task<Guid> Post(CreateTodo create)
         {
-            var (aggregate, evnt) = TodoItemAggregate.New(create.Title);
+            var evnt = TodoItemAggregate.New(create.Title);
             await _eventStore.Store(evnt);
-            return aggregate.Id;
+            return evnt.Id;
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
             var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
-            var (_, evnt) = aggregate.Delete();
+            var evnt = aggregate.Delete();
             await _eventStore.Store(evnt);
         }
 
@@ -48,7 +48,7 @@ namespace BlazorEventsTodo.Todo
             try
             {
                 var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
-                var (_, evnt) = aggregate.Finish();
+                var evnt = aggregate.Finish();
                 await _eventStore.Store(evnt);
             }
             catch (AggregateChangeException ex)
@@ -65,7 +65,7 @@ namespace BlazorEventsTodo.Todo
             try
             {
                 var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
-                var (_, evnt) = aggregate.Start();
+                var evnt = aggregate.Start();
                 await _eventStore.Store(evnt);
             }
             catch (AggregateChangeException ex)

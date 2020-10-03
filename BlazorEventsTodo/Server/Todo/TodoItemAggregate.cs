@@ -31,37 +31,42 @@ namespace BlazorEventsTodo.Todo
             throw new NotSupportedException("Unknown event type.");
         }
 
+        public TodoItemAggregate Update(IDomainEvent<TodoItemDomainEvent> domainEvent)
+        {
+            return Apply(this, domainEvent);
+        }
+
         #endregion
 
         #region Modify
 
-        public static (TodoItemAggregate, TodoItemDomainEvent) New(string Title)
+        public static TodoItemDomainEvent New(string Title)
         {
             Guid newId = Guid.NewGuid();
-            return (new TodoItemAggregate(newId, 0, Title, false, false), new TodoItemCreated(newId, Title));
+            return new TodoItemCreated(newId, Title);
         }
 
-        public (TodoItemAggregate, TodoItemDomainEvent) Delete()
+        public TodoItemDomainEvent Delete()
         {
-            return (this with { IsDeleted = true }, new TodoItemDeleted(Id));
+            return new TodoItemDeleted(Id);
         }
 
-        public (TodoItemAggregate, TodoItemDomainEvent) Finish()
+        public TodoItemDomainEvent Finish()
         {
             if (IsDeleted)
             {
                 throw new AggregateChangeException("Cannot finish deleted item.");
             }
-            return (this with { IsFinished = true }, new TodoItemFinished(Id));
+            return new TodoItemFinished(Id);
         }
 
-        public (TodoItemAggregate, TodoItemDomainEvent) Start()
+        public TodoItemDomainEvent Start()
         {
             if (IsDeleted)
             {
                 throw new AggregateChangeException("Cannot start deleted item.");
             }
-            return (this with { IsFinished = false }, new TodoItemStarted(Id));
+            return new TodoItemStarted(Id);
         }
 
         #endregion
