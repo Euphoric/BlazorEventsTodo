@@ -1,4 +1,5 @@
 ﻿using EventStore.Client;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -95,10 +96,11 @@ namespace BlazorEventsTodo.EventStorage
             return Task.CompletedTask;
         }
 
-        private IDomainEvent<IDomainEventData> ParseEvent(ResolvedEvent evnt)
+        private IDomainEvent<IDomainEventData> ParseEvent(ResolvedEvent resolvedEvent)
         {
-            var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
-            var @event = _eventFactory.DeserializeFromData(evnt.Event.EventId.ToGuid(), evnt.Event.EventType, dataJson);
+            EventRecord evnt = resolvedEvent.Event;
+            var dataJson = Encoding.UTF8.GetString(evnt.Data.Span);
+            var @event = _eventFactory.DeserializeFromData(evnt.EventId.ToGuid(), evnt.EventNumber.ToUInt64(), evnt.EventType, dataJson);
             return @event;
         }
 

@@ -17,6 +17,7 @@ namespace BlazorEventsTodo.EventStorage
         where TEvent : IDomainEventData
     {
         Guid Id { get; }
+        ulong Version{get;}
         string AggregateKey { get; }
         string EventName { get; }
         TEvent Data { get; }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BlazorEventsTodo.Todo
 {
-    public record TodoItemAggregate(Guid Id, string Title, bool IsDeleted, bool IsFinished)
+    public record TodoItemAggregate(Guid Id, ulong Version, string Title, bool IsDeleted, bool IsFinished)
     {
         #region Rebuild
 
@@ -19,13 +19,13 @@ namespace BlazorEventsTodo.Todo
             switch (evnt.Data)
             {
                 case TodoItemCreated created:
-                    return new TodoItemAggregate(created.Id, created.Title, false, false);
+                    return new TodoItemAggregate(created.Id, evnt.Version, created.Title, false, false);
                 case TodoItemDeleted:
-                    return aggr with { IsDeleted = true };
+                    return aggr with { Version = evnt.Version, IsDeleted = true };
                 case TodoItemFinished:
-                    return aggr with { IsFinished = true };
+                    return aggr with { Version = evnt.Version, IsFinished = true };
                 case TodoItemStarted:
-                    return aggr with { IsFinished = false };
+                    return aggr with { Version = evnt.Version, IsFinished = false };
             }
 
             throw new NotSupportedException("Unknown event type.");
@@ -38,7 +38,7 @@ namespace BlazorEventsTodo.Todo
         public static (TodoItemAggregate, IDomainEvent<TodoItemDomainEvent>) New(DomainEventFactory eventFactory, string Title)
         {
             Guid newId = Guid.NewGuid();
-            return (new TodoItemAggregate(newId, Title, false, false), eventFactory.Create(new TodoItemCreated(newId, Title)));
+            return (new TodoItemAggregate(newId, 0, Title, false, false), eventFactory.Create(new TodoItemCreated(newId, Title)));
         }
 
         public (TodoItemAggregate, IDomainEvent<TodoItemDomainEvent>) Delete(DomainEventFactory eventFactory)
