@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.EventStorage
@@ -6,6 +7,9 @@ namespace BlazorEventsTodo.EventStorage
     public interface IEventStore
     {
         public Task Store(IDomainEvent<IDomainEventData> @event);
+
+        IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey)
+            where TEvent : IDomainEventData;
     }
 
     public class EventStore : IEventStore
@@ -16,6 +20,11 @@ namespace BlazorEventsTodo.EventStorage
         public EventStore(DomainEventSender sender)
         {
             _sender = sender;
+        }
+
+        public IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey) where TEvent : IDomainEventData
+        {
+            return _events.OfType<IDomainEvent<TEvent>>().Where(x=>x.AggregateKey == aggregateKey).ToAsyncEnumerable();
         }
 
         public Task Store(IDomainEvent<IDomainEventData> @event)

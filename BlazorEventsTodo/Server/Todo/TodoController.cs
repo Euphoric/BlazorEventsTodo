@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.Todo
@@ -30,25 +31,32 @@ namespace BlazorEventsTodo.Todo
         [HttpPost]
         public async Task<Guid> Post(CreateTodo create)
         {
-            var newId = Guid.NewGuid();
-            await _eventStore.Store(_eventFactory.Create(new TodoItemCreated(newId, create.Title)));
-            return newId;
+            var (aggregate, evnt) = TodoItemAggregate.New(_eventFactory, create.Title);
+            await _eventStore.Store(evnt);
+            return aggregate.Id;
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _eventStore.Store(_eventFactory.Create(new TodoItemDeleted(id)));
+            var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+            var (_, evnt) = aggregate.Delete(_eventFactory);
+            await _eventStore.Store(evnt);
         }
 
         [HttpPost("{id}/finish")]
         public async Task<IActionResult> Finish(Guid id)
         {
-            if (!_todoListProjection.TodoExists(id))
+            try
             {
-                return BadRequest();
+                var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+                var (_, evnt) = aggregate.Finish(_eventFactory);
+                await _eventStore.Store(evnt);
             }
-            await _eventStore.Store(_eventFactory.Create(new TodoItemFinished(id)));
+            catch (AggregateChangeException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             return Ok();
         }
@@ -56,12 +64,16 @@ namespace BlazorEventsTodo.Todo
         [HttpPost("{id}/start")]
         public async Task<IActionResult> Start(Guid id)
         {
-            if (!_todoListProjection.TodoExists(id))
+            try
             {
-                return BadRequest();
+                var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+                var (_, evnt) = aggregate.Start(_eventFactory);
+                await _eventStore.Store(evnt);
             }
-
-            await _eventStore.Store(_eventFactory.Create(new TodoItemStarted(id)));
+            catch (AggregateChangeException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             return Ok();
         }

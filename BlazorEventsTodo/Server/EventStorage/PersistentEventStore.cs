@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -85,14 +86,27 @@ namespace BlazorEventsTodo.EventStorage
                 return Task.CompletedTask;
             }
 
-            var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
-            var @event = _eventFactory.DeserializeFromData(evnt.Event.EventId.ToGuid(), evnt.Event.EventType, dataJson);
+            IDomainEvent<IDomainEventData> @event = ParseEvent(evnt);
 
             _logger.LogDebug("Processed event {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
 
             _sender.SendEvent(@event);
 
             return Task.CompletedTask;
+        }
+
+        private IDomainEvent<IDomainEventData> ParseEvent(ResolvedEvent evnt)
+        {
+            var dataJson = Encoding.UTF8.GetString(evnt.Event.Data.Span);
+            var @event = _eventFactory.DeserializeFromData(evnt.Event.EventId.ToGuid(), evnt.Event.EventType, dataJson);
+            return @event;
+        }
+
+        public IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey) where TEvent : IDomainEventData
+        {
+            var events = _client.ReadStreamAsync(Direction.Forwards, aggregateKey, StreamPosition.Start);
+            
+            return events.Select(ParseEvent).Cast<IDomainEvent<TEvent>>();
         }
     }
 }
