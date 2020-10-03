@@ -7,7 +7,7 @@ using System.Reflection;
 namespace BlazorEventsTodo.Todo
 {
     public record AggregateBuilder<TAggregate>
-        where TAggregate : class
+        where TAggregate : Aggregate
     {
         private static MethodInfo _initializeMethod;
         private static MethodInfo _updateMethod;
@@ -40,6 +40,9 @@ namespace BlazorEventsTodo.Todo
             {
                 newAggr = (TAggregate)_updateMethod.Invoke(Aggregate, new object[] { evnt });
             }
+
+            newAggr = newAggr with { Version = evnt.Version, Events = newAggr.Events.Add(evnt) };
+
             return this with { Aggregate = newAggr };
         }
 

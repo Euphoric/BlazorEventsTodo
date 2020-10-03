@@ -3,13 +3,13 @@ using System;
 
 namespace BlazorEventsTodo.Todo
 {
-    public record TodoItemAggregate(Guid Id, ulong Version, string Title, bool IsDeleted, bool IsFinished)
+    public record TodoItemAggregate(Guid Id, string Title, bool IsDeleted, bool IsFinished) : Aggregate
     {
-        #region Rebuild
+        #region Rehydrate
 
         public static TodoItemAggregate Initialize(IDomainEvent<TodoItemCreated> createdEvent)
         {
-            return new TodoItemAggregate(createdEvent.Data.Id, createdEvent.Version, createdEvent.Data.Title, false, false);
+            return new TodoItemAggregate(createdEvent.Data.Id, createdEvent.Data.Title, false, false);
         }
 
         public TodoItemAggregate Update(IDomainEvent<TodoItemDomainEvent> evnt)
@@ -30,7 +30,7 @@ namespace BlazorEventsTodo.Todo
                     throw new NotSupportedException("Unknown event type.");
             }
 
-            return aggr with { Version = evnt.Version };
+            return aggr;
         }
 
         #endregion
