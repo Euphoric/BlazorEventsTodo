@@ -35,33 +35,33 @@ namespace BlazorEventsTodo.Todo
 
         #region Modify
 
-        public static (TodoItemAggregate, IDomainEvent<TodoItemDomainEvent>) New(DomainEventFactory eventFactory, string Title)
+        public static (TodoItemAggregate, TodoItemDomainEvent) New(string Title)
         {
             Guid newId = Guid.NewGuid();
-            return (new TodoItemAggregate(newId, 0, Title, false, false), eventFactory.Create(new TodoItemCreated(newId, Title)));
+            return (new TodoItemAggregate(newId, 0, Title, false, false), new TodoItemCreated(newId, Title));
         }
 
-        public (TodoItemAggregate, IDomainEvent<TodoItemDomainEvent>) Delete(DomainEventFactory eventFactory)
+        public (TodoItemAggregate, TodoItemDomainEvent) Delete()
         {
-            return (this with { IsDeleted = true }, eventFactory.Create(new TodoItemDeleted(Id)));
+            return (this with { IsDeleted = true }, new TodoItemDeleted(Id));
         }
 
-        public (TodoItemAggregate, IDomainEvent<TodoItemDomainEvent>) Finish(DomainEventFactory eventFactory)
+        public (TodoItemAggregate, TodoItemDomainEvent) Finish()
         {
             if (IsDeleted)
             {
                 throw new AggregateChangeException("Cannot finish deleted item.");
             }
-            return (this with { IsFinished = true }, eventFactory.Create(new TodoItemFinished(Id)));
+            return (this with { IsFinished = true }, new TodoItemFinished(Id));
         }
 
-        public (TodoItemAggregate, IDomainEvent<TodoItemDomainEvent>) Start(DomainEventFactory eventFactory)
+        public (TodoItemAggregate, TodoItemDomainEvent) Start()
         {
             if (IsDeleted)
             {
                 throw new AggregateChangeException("Cannot start deleted item.");
             }
-            return (this with { IsFinished = false }, eventFactory.Create(new TodoItemStarted(Id)));
+            return (this with { IsFinished = false }, new TodoItemStarted(Id));
         }
 
         #endregion

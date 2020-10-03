@@ -68,14 +68,17 @@ namespace BlazorEventsTodo.EventStorage
             return new EventStoreClient(settingsWorkAround);
         }
 
-        public async Task Store(IDomainEvent<IDomainEventData> @event)
+        public async Task Store(IDomainEventData eventData)
         {
-            var dataJson = _eventFactory.SerializeToData(@event);
+            var dataJson = _eventFactory.SerializeToData(eventData);
             var data = Encoding.UTF8.GetBytes(dataJson);
             var metadata = Encoding.UTF8.GetBytes("{}");
 
-            var evt = new EventData(Uuid.FromGuid(@event.Id), @event.EventName, data, metadata);
-            var result = await _client.AppendToStreamAsync(@event.AggregateKey, StreamState.Any, new List<EventData>() { evt });
+            var eventId = Guid.NewGuid();
+            var eventName = _eventFactory.EventName(eventData);
+            var evt = new EventData(Uuid.FromGuid(eventId), eventName, data, metadata);
+
+            var result = await _client.AppendToStreamAsync(eventData.GetAggregateKey(), StreamState.Any, new List<EventData>() { evt });
             _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
         }
 

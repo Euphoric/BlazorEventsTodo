@@ -13,13 +13,11 @@ namespace BlazorEventsTodo.Todo
     {
         private IEventStore _eventStore;
         private TodoListProjection _todoListProjection;
-        private DomainEventFactory _eventFactory;
 
-        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection, DomainEventFactory eventFactory)
+        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection)
         {
             _eventStore = eventStore;
             _todoListProjection = todoListProjection;
-            _eventFactory = eventFactory;
         }
 
         [HttpGet]
@@ -31,7 +29,7 @@ namespace BlazorEventsTodo.Todo
         [HttpPost]
         public async Task<Guid> Post(CreateTodo create)
         {
-            var (aggregate, evnt) = TodoItemAggregate.New(_eventFactory, create.Title);
+            var (aggregate, evnt) = TodoItemAggregate.New(create.Title);
             await _eventStore.Store(evnt);
             return aggregate.Id;
         }
@@ -40,7 +38,7 @@ namespace BlazorEventsTodo.Todo
         public async Task Delete(Guid id)
         {
             var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
-            var (_, evnt) = aggregate.Delete(_eventFactory);
+            var (_, evnt) = aggregate.Delete();
             await _eventStore.Store(evnt);
         }
 
@@ -50,7 +48,7 @@ namespace BlazorEventsTodo.Todo
             try
             {
                 var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
-                var (_, evnt) = aggregate.Finish(_eventFactory);
+                var (_, evnt) = aggregate.Finish();
                 await _eventStore.Store(evnt);
             }
             catch (AggregateChangeException ex)
@@ -67,7 +65,7 @@ namespace BlazorEventsTodo.Todo
             try
             {
                 var aggregate = TodoItemAggregate.Rebuild(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
-                var (_, evnt) = aggregate.Start(_eventFactory);
+                var (_, evnt) = aggregate.Start();
                 await _eventStore.Store(evnt);
             }
             catch (AggregateChangeException ex)

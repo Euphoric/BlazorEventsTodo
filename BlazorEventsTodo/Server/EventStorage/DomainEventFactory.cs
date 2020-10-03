@@ -12,13 +12,6 @@ namespace BlazorEventsTodo.EventStorage
             _eventTypeLocator = new EventTypeLocator();
         }
 
-        public IDomainEvent<TEventData> Create<TEventData>(TEventData eventData)
-            where TEventData : IDomainEventData
-        {
-            var eventName = _eventTypeLocator.GetTypeString(eventData.GetType());
-            return new DomainEvent<TEventData>(Guid.NewGuid(), 0, eventData, eventName);
-        }
-
         private class DomainEvent<TData> : IDomainEvent<TData>
             where TData : IDomainEventData
         {
@@ -53,9 +46,22 @@ namespace BlazorEventsTodo.EventStorage
             return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, version, data, eventName });
         }
 
-        public string SerializeToData(IDomainEvent<IDomainEventData> @event)
+        public IDomainEvent<IDomainEventData> CreateEvent(ulong version, IDomainEventData eventData)
         {
-            var eventData = @event.Data;
+            var eventType = eventData.GetType();
+            var id = Guid.NewGuid();
+            var eventName = EventName(eventData);
+            var domainEventContainerType = typeof(DomainEvent<>).MakeGenericType(eventType);
+            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, version, eventData, eventName });
+        }
+
+        public string EventName(IDomainEventData eventData)
+        {
+            return _eventTypeLocator.GetTypeString(eventData.GetType());
+        }
+
+        public string SerializeToData(IDomainEventData eventData)
+        {
             var eventType = eventData.GetType();
             return JsonSerializer.Serialize(eventData, eventType);
         }
