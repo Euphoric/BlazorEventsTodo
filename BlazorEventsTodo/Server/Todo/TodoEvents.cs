@@ -3,53 +3,31 @@ using System;
 
 namespace BlazorEventsTodo.Todo
 {
-    public abstract class TodoItemDomainEvent : IDomainEventData
+    public abstract record TodoItemDomainEvent(Guid Id) : IDomainEventData
     {
-        public TodoItemDomainEvent(Guid id)
-        {
-            Id = id;
-        }
-
         public string GetAggregateKey()
         {
             return $"todo-{Id}";
         }
-
-        public Guid Id { get; }
     }
 
     [DomainEvent("todo-item-created")]
-    public class TodoItemCreated : TodoItemDomainEvent
+    public record TodoItemCreated(Guid Id, string Title) : TodoItemDomainEvent(Id)
     {
-        public TodoItemCreated(Guid id, string title)
-            :base(id)
-        {
-            Title = title;
-        }
-        public string Title { get; }
     }
 
     [DomainEvent("todo-item-deleted")]
-    public class TodoItemDeleted : TodoItemDomainEvent
+    public record TodoItemDeleted(Guid Id) : TodoItemDomainEvent(Id)
     {
-        public TodoItemDeleted(Guid id):base(id)
-        {
-        }
     }
 
     [DomainEvent("todo-item-finished")]
-    public class TodoItemFinished : TodoItemDomainEvent
+    public record TodoItemFinished(Guid Id) : TodoItemDomainEvent(Id)
     {
-        public TodoItemFinished(Guid id):base(id)
-        {
-        }
     }
 
     [DomainEvent("todo-item-started")]
-    public class TodoItemStarted : TodoItemDomainEvent
+    public record TodoItemStarted(Guid Id) : TodoItemDomainEvent(Id)
     {
-        public TodoItemStarted(Guid id):base(id)
-        {
-        }
     }
 }
