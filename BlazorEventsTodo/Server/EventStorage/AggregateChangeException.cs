@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace BlazorEventsTodo.Todo
+namespace BlazorEventsTodo.EventStorage
 {
     public class AggregateChangeException : Exception
     {
         public AggregateChangeException(string message)
-            :base(message)
+            : base(message)
         {
 
         }

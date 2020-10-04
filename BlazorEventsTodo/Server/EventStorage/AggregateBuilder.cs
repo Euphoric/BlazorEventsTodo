@@ -1,10 +1,9 @@
-﻿using BlazorEventsTodo.EventStorage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace BlazorEventsTodo.Todo
+namespace BlazorEventsTodo.EventStorage
 {
     public record AggregateBuilder<TAggregate>
         where TAggregate : Aggregate

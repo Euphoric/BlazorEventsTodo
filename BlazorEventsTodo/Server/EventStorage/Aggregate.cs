@@ -1,7 +1,6 @@
-﻿using BlazorEventsTodo.EventStorage;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
-namespace BlazorEventsTodo.Todo
+namespace BlazorEventsTodo.EventStorage
 {
     public record Aggregate
     {
