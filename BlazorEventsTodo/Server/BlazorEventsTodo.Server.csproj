@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<LangVersion>9.0</LangVersion>
+		<RootNamespace>BlazorEventsTodo</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,13 +17,9 @@
 	</ItemGroup>
 
 	<!--Remove afte update to .NET5 RC2-->
-	<PropertyGroup>
+	<PropertyGroup  Condition="'$(Configuration)'=='Debug'">
 		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
-	</PropertyGroup>
-	<!--Remove afte update to .NET5 RC2-->
-	<PropertyGroup>
 		<PreBuildEvent>kill-port 9300</PreBuildEvent>
-		<RootNamespace>BlazorEventsTodo</RootNamespace>
 	</PropertyGroup>
 
 
