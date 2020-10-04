@@ -1,4 +1,5 @@
 ﻿using EventStore.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,11 +21,16 @@ namespace BlazorEventsTodo.EventStorage
         private DomainEventFactory _eventFactory;
         private ILogger _logger;
 
-        public PersistentEventStore(ILoggerFactory loggerFactory, DomainEventSender sender, DomainEventFactory eventFactory)
+        public PersistentEventStore(
+            ILoggerFactory loggerFactory,
+            DomainEventSender sender,
+            DomainEventFactory eventFactory,
+            IConfiguration configuration)
         {
             _sender = sender;
             _logger = loggerFactory.CreateLogger<PersistentEventStore>();
-            _client = CreateClientWithConnection(loggerFactory);
+            var connectionString = configuration.GetConnectionString("EventStore");
+            _client = CreateClientWithConnection(connectionString, loggerFactory);
             _eventFactory = eventFactory;
         }
 
@@ -39,28 +45,22 @@ namespace BlazorEventsTodo.EventStorage
             _logger.LogInformation("Subscribed to events.");
         }
 
-        private static EventStoreClient CreateClientWithConnection(ILoggerFactory loggerFactory)
+        private static EventStoreClient CreateClientWithConnection(string connectionString, ILoggerFactory loggerFactory)
         {
+            var settings = EventStoreClientSettings.Create(connectionString);
+            settings.LoggerFactory = loggerFactory;
             /** https://discuss.eventstore.com/t/basic-eventstoredb-v20-example/2553
              *  settings workaround for certificate issues when trying out the client
              *  I didn't have this problem but if you are running event store in --dev mode this might be an issue'
              */
-            var settingsWorkAround = new EventStoreClientSettings
-            {
-                CreateHttpMessageHandler = () =>
+            settings.CreateHttpMessageHandler = () =>
                     new HttpClientHandler
                     {
                         ServerCertificateCustomValidationCallback =
                             (message, certificate2, x509Chain, sslPolicyErrors) => true
-                    },
-                ConnectivitySettings = {
-                    Address = new Uri("https://localhost:2113")
-                },
-                LoggerFactory = loggerFactory,
-                DefaultCredentials = new UserCredentials("admin", "changeit")
-            };
+                    };
 
-            return new EventStoreClient(settingsWorkAround);
+            return new EventStoreClient(settings);
         }
 
         public async Task Store(ICreateEvent<IDomainEventData> newEvent)

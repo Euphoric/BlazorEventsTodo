@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EventStore.Client.Grpc.Streams" Version="20.6.0" />
+		<PackageReference Include="EventStore.Client.Grpc.Streams" Version="20.6.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.0-rc.1.20451.17" />
 	</ItemGroup>
 
@@ -17,7 +17,7 @@
 	</ItemGroup>
 
 	<!--Remove afte update to .NET5 RC2-->
-	<PropertyGroup  Condition="'$(Configuration)'=='Debug'">
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
 		<PreBuildEvent>kill-port 9300</PreBuildEvent>
 	</PropertyGroup>
