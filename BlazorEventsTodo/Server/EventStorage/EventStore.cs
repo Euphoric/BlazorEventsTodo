@@ -6,7 +6,7 @@ namespace BlazorEventsTodo.EventStorage
 {
     public interface IEventStore
     {
-        public Task Store(IDomainEventData eventData);
+        public Task Store(ICreateEvent<IDomainEventData> eventData);
 
         IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey)
             where TEvent : IDomainEventData;
@@ -29,8 +29,9 @@ namespace BlazorEventsTodo.EventStorage
             return _events.OfType<IDomainEvent<TEvent>>().Where(x => x.AggregateKey == aggregateKey).ToAsyncEnumerable();
         }
 
-        public Task Store(IDomainEventData eventData)
+        public Task Store(ICreateEvent<IDomainEventData> newEvent)
         {
+            var eventData = newEvent.Data;
             var eventVersion = _events.Where(x=>x.AggregateKey == eventData.GetAggregateKey()).Select(x=>(ulong?)x.Version).Max(x=>x) ?? 0;
             var @event = _eventFactory.CreateEvent(eventVersion, eventData);
 

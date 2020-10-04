@@ -68,8 +68,10 @@ namespace BlazorEventsTodo.EventStorage
             return new EventStoreClient(settingsWorkAround);
         }
 
-        public async Task Store(IDomainEventData eventData)
+        public async Task Store(ICreateEvent<IDomainEventData> newEvent)
         {
+            var eventData = newEvent.Data;
+
             var dataJson = _eventFactory.SerializeToData(eventData);
             var data = Encoding.UTF8.GetBytes(dataJson);
             var metadata = Encoding.UTF8.GetBytes("{}");

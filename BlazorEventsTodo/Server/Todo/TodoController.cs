@@ -31,7 +31,7 @@ namespace BlazorEventsTodo.Todo
         {
             var evnt = TodoItemAggregate.New(create.Title);
             await _eventStore.Store(evnt);
-            return evnt.Id;
+            return evnt.Data.Id;
         }
 
         [HttpDelete("{id}")]

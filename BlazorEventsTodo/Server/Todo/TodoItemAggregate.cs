@@ -37,33 +37,33 @@ namespace BlazorEventsTodo.Todo
 
         #region Modify
 
-        public static TodoItemDomainEvent New(string Title)
+        public static ICreateEvent<TodoItemDomainEvent> New(string Title)
         {
             Guid newId = Guid.NewGuid();
-            return new TodoItemCreated(newId, Title);
+            return new TodoItemCreated(newId, Title).Create();
         }
 
-        public TodoItemDomainEvent Delete()
+        public ICreateEvent<TodoItemDomainEvent> Delete()
         {
-            return new TodoItemDeleted(Id);
+            return new TodoItemDeleted(Id).Create();
         }
 
-        public TodoItemDomainEvent Finish()
+        public ICreateEvent<TodoItemDomainEvent> Finish()
         {
             if (IsDeleted)
             {
                 throw new AggregateChangeException("Cannot finish deleted item.");
             }
-            return new TodoItemFinished(Id);
+            return new TodoItemFinished(Id).Create();
         }
 
-        public TodoItemDomainEvent Start()
+        public ICreateEvent<TodoItemDomainEvent> Start()
         {
             if (IsDeleted)
             {
                 throw new AggregateChangeException("Cannot start deleted item.");
             }
-            return new TodoItemStarted(Id);
+            return new TodoItemStarted(Id).Create();
         }
 
         #endregion

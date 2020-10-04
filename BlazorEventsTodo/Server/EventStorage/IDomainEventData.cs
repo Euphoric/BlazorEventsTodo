@@ -17,9 +17,27 @@ namespace BlazorEventsTodo.EventStorage
         where TEvent : IDomainEventData
     {
         Guid Id { get; }
-        ulong Version{get;}
+        ulong Version { get; }
         string AggregateKey { get; }
         string EventName { get; }
         TEvent Data { get; }
+    }
+
+    public interface ICreateEvent<out TEvent>
+        where TEvent : IDomainEventData
+    {
+        TEvent Data { get; }
+    }
+
+    public static class CreateEventExtension
+    {
+        private record CreateEvent<TEvent>(TEvent Data) : ICreateEvent<TEvent>
+            where TEvent : IDomainEventData;
+
+        public static ICreateEvent<TEvent> Create<TEvent>(this TEvent data)
+            where TEvent : IDomainEventData
+        {
+            return new CreateEvent<TEvent>(data);
+        }
     }
 }
