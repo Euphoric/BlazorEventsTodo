@@ -40,12 +40,12 @@ namespace BlazorEventsTodo.Todo
         public static ICreateEvent<TodoItemDomainEvent> New(string Title)
         {
             Guid newId = Guid.NewGuid();
-            return new TodoItemCreated(newId, Title).Create();
+            return new TodoItemCreated(newId, Title).AsNewAggregate();
         }
 
         public ICreateEvent<TodoItemDomainEvent> Delete()
         {
-            return new TodoItemDeleted(Id).Create();
+            return new TodoItemDeleted(Id).AsVersioned(Version);
         }
 
         public ICreateEvent<TodoItemDomainEvent> Finish()
@@ -54,7 +54,7 @@ namespace BlazorEventsTodo.Todo
             {
                 throw new AggregateChangeException("Cannot finish deleted item.");
             }
-            return new TodoItemFinished(Id).Create();
+            return new TodoItemFinished(Id).AsVersioned(Version);
         }
 
         public ICreateEvent<TodoItemDomainEvent> Start()
@@ -63,7 +63,7 @@ namespace BlazorEventsTodo.Todo
             {
                 throw new AggregateChangeException("Cannot start deleted item.");
             }
-            return new TodoItemStarted(Id).Create();
+            return new TodoItemStarted(Id).AsVersioned(Version);
         }
 
         #endregion

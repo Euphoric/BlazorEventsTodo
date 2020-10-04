@@ -1,5 +1,4 @@
 ﻿using EventStore.Client;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -14,10 +13,6 @@ namespace BlazorEventsTodo.EventStorage
     /// <summary>
     /// Requires EventStore v20.6.0, run with --dev parameter at the moment.
     /// </summary>
-    /// <remarks>
-    /// TODO : Correct event versions.
-    /// ??? : Subscription delay.
-    /// </remarks>
     public class PersistentEventStore : IEventStore, IDisposable
     {
         private DomainEventSender _sender;
@@ -79,8 +74,21 @@ namespace BlazorEventsTodo.EventStorage
             var eventId = Guid.NewGuid();
             var eventName = _eventFactory.EventName(eventData);
             var evt = new EventData(Uuid.FromGuid(eventId), eventName, data, metadata);
+            var eventStream = eventData.GetAggregateKey();
 
-            var result = await _client.AppendToStreamAsync(eventData.GetAggregateKey(), StreamState.Any, new List<EventData>() { evt });
+            IWriteResult result;
+            if (newEvent.IsNewAggregate)
+            {
+                result = await _client.AppendToStreamAsync(eventStream, StreamState.NoStream, new List<EventData>() { evt });
+            }
+            else if (newEvent.IsVersioned)
+            {
+                result = await _client.AppendToStreamAsync(eventStream, new StreamRevision(newEvent.Version), new List<EventData>() { evt });
+            }
+            else
+            {
+                result = await _client.AppendToStreamAsync(eventStream, StreamState.StreamExists, new List<EventData>() { evt });
+            }
             _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
         }
 
@@ -112,7 +120,7 @@ namespace BlazorEventsTodo.EventStorage
         public IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey) where TEvent : IDomainEventData
         {
             var events = _client.ReadStreamAsync(Direction.Forwards, aggregateKey, StreamPosition.Start);
-            
+
             return events.Select(ParseEvent).Cast<IDomainEvent<TEvent>>();
         }
     }

@@ -26,18 +26,33 @@ namespace BlazorEventsTodo.EventStorage
     public interface ICreateEvent<out TEvent>
         where TEvent : IDomainEventData
     {
+        bool IsNewAggregate { get; }
+        bool IsVersioned { get; }
+        ulong Version { get; }
         TEvent Data { get; }
     }
 
     public static class CreateEventExtension
     {
-        private record CreateEvent<TEvent>(TEvent Data) : ICreateEvent<TEvent>
+        private record CreateEvent<TEvent>(TEvent Data, bool IsNewAggregate, bool IsVersioned, ulong Version) : ICreateEvent<TEvent>
             where TEvent : IDomainEventData;
 
-        public static ICreateEvent<TEvent> Create<TEvent>(this TEvent data)
+        public static ICreateEvent<TEvent> AsNewAggregate<TEvent>(this TEvent data)
             where TEvent : IDomainEventData
         {
-            return new CreateEvent<TEvent>(data);
+            return new CreateEvent<TEvent>(data, true, false, 0);
+        }
+
+        public static ICreateEvent<TEvent> AsVersioned<TEvent>(this TEvent data, ulong version)
+            where TEvent : IDomainEventData
+        {
+            return new CreateEvent<TEvent>(data, false, true, version);
+        }
+
+        public static ICreateEvent<TEvent> AsUnversioned<TEvent>(this TEvent data)
+            where TEvent : IDomainEventData
+        {
+            return new CreateEvent<TEvent>(data, false, false, 0);
         }
     }
 }
