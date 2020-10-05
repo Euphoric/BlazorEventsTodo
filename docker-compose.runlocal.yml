@@ -1,0 +1,53 @@
+version: "3.5"
+services:
+
+    volumes-provisioner:
+        image: hasnat/volumes-provisioner
+        environment:
+            PROVISION_DIRECTORIES: "1000:1000:0755:/tmp/certs"
+        volumes:
+            - "./certs:/tmp/certs"
+        network_mode: none
+    cert-gen:
+        image: eventstore/es-gencert-cli:1.0.2
+        entrypoint: bash
+        command: >
+            -c "es-gencert-cli create-ca -out /tmp/certs/ca &&
+                es-gencert-cli create-node -ca-certificate /tmp/certs/ca/ca.crt -ca-key /tmp/certs/ca/ca.key -out \
+                /tmp/certs/node1 -ip-addresses 127.0.0.1,172.30.240.11"
+        user: "1000:1000"
+        volumes:
+            - "./certs:/tmp/certs"
+        depends_on:
+            - volumes-provisioner
+    eventstore:
+        image: eventstore/eventstore:20.6.1-bionic
+        environment:
+            - EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node1/node.crt
+            - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/eventstore/certs/node1/node.key
+            - EVENTSTORE_TRUSTED_ROOT_CERTIFICATES_PATH=/etc/eventstore/certs/ca
+        ports:
+            - 1111:1113
+            - 2111:2113
+        volumes:
+            - ./certs:/etc/eventstore/certs
+        restart: unless-stopped
+        depends_on:
+            - cert-gen
+
+    website:
+        # Build when running locally
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        hostname: website
+        ports:
+           - "8010:80"
+           - "44310:443"
+        depends_on:
+            - eventstore
+        environment:
+            "ASPNETCORE_ENVIRONMENT": "Staging"
+            "ConnectionStrings:EventStore": "esdb://admin:changeit@eventstore:2113/?TlsVerifyCert=false"
+            "WaitOnStartup": "3"
+            
