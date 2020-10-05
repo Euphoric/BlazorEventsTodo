@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +29,10 @@ namespace BlazorEventsTodo.EventStorage
             _sender = sender;
             _logger = loggerFactory.CreateLogger<PersistentEventStore>();
             var connectionString = configuration.GetConnectionString("EventStore");
+            if (connectionString == null)
+            {
+                throw new InvalidOperationException("Connection string 'EventStore' must be set.");
+            }
             _client = CreateClientWithConnection(connectionString, loggerFactory);
             _eventFactory = eventFactory;
         }
@@ -49,17 +52,6 @@ namespace BlazorEventsTodo.EventStorage
         {
             var settings = EventStoreClientSettings.Create(connectionString);
             settings.LoggerFactory = loggerFactory;
-            /** https://discuss.eventstore.com/t/basic-eventstoredb-v20-example/2553
-             *  settings workaround for certificate issues when trying out the client
-             *  I didn't have this problem but if you are running event store in --dev mode this might be an issue'
-             */
-            settings.CreateHttpMessageHandler = () =>
-                    new HttpClientHandler
-                    {
-                        ServerCertificateCustomValidationCallback =
-                            (message, certificate2, x509Chain, sslPolicyErrors) => true
-                    };
-
             return new EventStoreClient(settings);
         }
 
