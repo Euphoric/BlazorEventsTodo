@@ -15,14 +15,16 @@ namespace BlazorEventsTodo.EventStorage
 
     public class EventStore : IEventStore
     {
-        List<IDomainEvent<IDomainEventData>> _events = new List<IDomainEvent<IDomainEventData>>();
-        private DomainEventSender _sender;
-        private DomainEventFactory _eventFactory;
+        private readonly List<IDomainEvent<IDomainEventData>> _events = new List<IDomainEvent<IDomainEventData>>();
+        private readonly DomainEventSender _sender;
+        private readonly DomainEventFactory _eventFactory;
+        private readonly IClock _clock;
 
-        public EventStore(DomainEventSender sender, DomainEventFactory eventFactory)
+        public EventStore(DomainEventSender sender, DomainEventFactory eventFactory, IClock clock)
         {
             _sender = sender;
             _eventFactory = eventFactory;
+            _clock = clock;
         }
 
         public IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey) where TEvent : IDomainEventData
@@ -34,7 +36,7 @@ namespace BlazorEventsTodo.EventStorage
         {
             var eventData = newEvent.Data;
             var eventVersion = _events.Where(x=>x.AggregateKey == eventData.GetAggregateKey()).Select(x=>(ulong?)x.Version).Max(x=>x) ?? 0;
-            Instant created = SystemClock.Instance.GetCurrentInstant();
+            Instant created = _clock.GetCurrentInstant();
             var @event = _eventFactory.CreateEvent(eventVersion, created, eventData);
 
             _events.Add(@event);

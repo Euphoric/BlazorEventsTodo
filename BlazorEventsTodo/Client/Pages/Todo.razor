@@ -1,5 +1,6 @@
 ﻿@page "/todo"
 @using BlazorEventsTodo.Todo
+@using NodaTime 
 @inject HttpClient Http
 
     <h3>Todo</h3>
@@ -28,9 +29,11 @@
                 <ul>
                     @foreach (var todo in history.Reverse())
                     {
-                        <li>
-                            <span>@todo.Description</span>
-                        </li>
+                    <li>
+                        <span>@todo.Changed.InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToString("yyyy'-'MM'-'dd' 'HH':'mm':'ss", null)</span>
+                        - 
+                        <span>@todo.Description</span>
+                    </li>
                     }
                 </ul>
             </div>
@@ -58,7 +61,7 @@
         private async Task RefreshTodoList()
         {
             todos = await Http.GetFromJsonAsync<List<TodoItem>>("/api/todo");
-            history = await Http.GetFromJsonAsync<List<TodoHistoryItem>>("/api/todo/history");
+            history = await Http.GetFromJsonAsync<List<TodoHistoryItem>>("/api/todo/history", DefaultJsonOptions.Options);
             StateHasChanged();
         }
 

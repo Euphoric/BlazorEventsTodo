@@ -1,5 +1,5 @@
 ﻿using BlazorEventsTodo.Todo;
-using Microsoft.AspNetCore.Mvc.Testing;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
@@ -157,28 +157,34 @@ namespace BlazorEventsTodo
             var firstTodo = new CreateTodo() { Title = "First todo" };
             var firstPostResponse = await client.PostAsJsonAsync("/api/todo", firstTodo);
             Guid firstTodoId = await firstPostResponse.Content.ReadFromJsonAsync<Guid>();
+            _factory.Clock.AdvanceSeconds(1);
 
             await client.PostAsJsonAsync($"/api/todo/{firstTodoId}/finish", "");
+            _factory.Clock.AdvanceSeconds(1);
 
             var secondTodo = new CreateTodo() { Title = "Second todo" };
             var secondPostResponse = await client.PostAsJsonAsync("/api/todo", secondTodo);
             Guid secondTodoId = await secondPostResponse.Content.ReadFromJsonAsync<Guid>();
+            _factory.Clock.AdvanceSeconds(1);
 
             await client.PostAsJsonAsync($"/api/todo/{firstTodoId}/start", "");
+            _factory.Clock.AdvanceSeconds(1);
 
             await client.PostAsJsonAsync($"/api/todo/{secondTodoId}/finish", "");
+            _factory.Clock.AdvanceSeconds(1);
 
             await client.DeleteAsync($"/api/todo/{firstTodoId}");
+            _factory.Clock.AdvanceSeconds(1);
 
-            var history = await client.GetFromJsonAsync<List<TodoHistoryItem>>("/api/todo/history");
+            var history = await client.GetFromJsonAsync<List<TodoHistoryItem>>("/api/todo/history", options: DefaultJsonOptions.Options);
 
             DeepAssert.Equal(new List<TodoHistoryItem>{
-                new TodoHistoryItem("Item created: First todo"),
-                new TodoHistoryItem("Item finished: First todo"),
-                new TodoHistoryItem("Item created: Second todo"),
-                new TodoHistoryItem("Item restarted: First todo"),
-                new TodoHistoryItem("Item finished: Second todo"),
-                new TodoHistoryItem("Item deleted: First todo"),
+                new TodoHistoryItem("Item created: First todo", Instant.FromUtc(2020, 2, 3, 4, 5, 0)),
+                new TodoHistoryItem("Item finished: First todo", Instant.FromUtc(2020, 2, 3, 4, 5, 1)),
+                new TodoHistoryItem("Item created: Second todo", Instant.FromUtc(2020, 2, 3, 4, 5, 2)),
+                new TodoHistoryItem("Item restarted: First todo", Instant.FromUtc(2020, 2, 3, 4, 5, 3)),
+                new TodoHistoryItem("Item finished: Second todo", Instant.FromUtc(2020, 2, 3, 4, 5, 4)),
+                new TodoHistoryItem("Item deleted: First todo", Instant.FromUtc(2020, 2, 3, 4, 5, 5)),
             }, history);
         }
     }

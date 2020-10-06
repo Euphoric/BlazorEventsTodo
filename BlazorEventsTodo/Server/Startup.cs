@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 using System;
 using System.Threading.Tasks;
 
@@ -23,8 +25,13 @@ namespace BlazorEventsTodo.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddJsonOptions(options=>{
+                    options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+                });
             services.AddRazorPages();
+
+            services.AddSingleton<IClock>(SystemClock.Instance);
 
             services.AddSingleton<IEventStore, PersistentEventStore>();
             services.AddSingleton<DomainEventSender>();

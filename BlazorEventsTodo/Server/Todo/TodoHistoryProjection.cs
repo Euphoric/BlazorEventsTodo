@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-//using KellermanSoftware.CompareNetObjects;
 
 namespace BlazorEventsTodo.Todo
 {
@@ -11,22 +10,22 @@ namespace BlazorEventsTodo.Todo
         List<TodoHistoryItem> _items = new List<TodoHistoryItem>();
         Dictionary<Guid, string> _itemTitles = new Dictionary<Guid, string>();
 
-        public void Handle(IDomainEvent<TodoItemDomainEvent> evntCont)
+        public void Handle(IDomainEvent<TodoItemDomainEvent> evnt)
         {
-            switch (evntCont.Data)
+            switch (evnt.Data)
             {
                 case TodoItemCreated created:
-                    _items.Add(new TodoHistoryItem("Item created: " + created.Title));
+                    _items.Add(new TodoHistoryItem("Item created: " + created.Title, evnt.Created));
                     _itemTitles.Add(created.Id, created.Title);
                     break;
                 case TodoItemDeleted deleted:
-                    _items.Add(new TodoHistoryItem("Item deleted: " + _itemTitles[deleted.Id]));
+                    _items.Add(new TodoHistoryItem("Item deleted: " + _itemTitles[deleted.Id], evnt.Created));
                     break;
                 case TodoItemFinished finished:
-                    _items.Add(new TodoHistoryItem("Item finished: " + _itemTitles[finished.Id]));
+                    _items.Add(new TodoHistoryItem("Item finished: " + _itemTitles[finished.Id], evnt.Created));
                     break;
                 case TodoItemStarted started:
-                    _items.Add(new TodoHistoryItem("Item restarted: " + _itemTitles[started.Id]));
+                    _items.Add(new TodoHistoryItem("Item restarted: " + _itemTitles[started.Id], evnt.Created));
                     break;
                 default:
                     break;

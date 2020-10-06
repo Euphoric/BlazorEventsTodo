@@ -1,7 +1,8 @@
 ﻿using KellermanSoftware.CompareNetObjects;
+using KellermanSoftware.CompareNetObjects.TypeComparers;
+using NodaTime;
 using System.Collections.Generic;
 using Xunit.Sdk;
-//using KellermanSoftware.CompareNetObjects;
 
 namespace BlazorEventsTodo.Todo
 {
@@ -12,6 +13,7 @@ namespace BlazorEventsTodo.Todo
             var compareLogic = new CompareLogic();
             compareLogic.Config.MaxDifferences = 5;
             compareLogic.Config.MembersToIgnore = new List<string>();
+            compareLogic.Config.CustomComparers.Add(new CustomComparer<Instant, Instant> { Compare = (a, b) => { return a.Equals(b); } });
 
             foreach (var property in propertiesToIgnore)
             {
