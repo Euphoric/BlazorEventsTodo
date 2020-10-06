@@ -10,6 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CompareNETObjects" Version="4.67.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.0-rc.1.20451.17" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
 		<PackageReference Include="System.Net.Http.Json" Version="5.0.0-rc.1.20451.14" />

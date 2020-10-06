@@ -138,6 +138,49 @@ namespace BlazorEventsTodo
                 Assert.Equal(System.Net.HttpStatusCode.BadRequest, postResponse.StatusCode);
             }
         }
+
+        [Fact]
+        public async Task Retrieves_empty_history()
+        {
+            var client = _factory.CreateClient();
+
+            var history = await client.GetFromJsonAsync<List<TodoHistoryItem>>("/api/todo/history");
+
+            Assert.Empty(history);
+        }
+
+        [Fact]
+        public async Task Retrieves_history_of_all_actions()
+        {
+            var client = _factory.CreateClient();
+
+            var firstTodo = new CreateTodo() { Title = "First todo" };
+            var firstPostResponse = await client.PostAsJsonAsync("/api/todo", firstTodo);
+            Guid firstTodoId = await firstPostResponse.Content.ReadFromJsonAsync<Guid>();
+
+            await client.PostAsJsonAsync($"/api/todo/{firstTodoId}/finish", "");
+
+            var secondTodo = new CreateTodo() { Title = "Second todo" };
+            var secondPostResponse = await client.PostAsJsonAsync("/api/todo", secondTodo);
+            Guid secondTodoId = await secondPostResponse.Content.ReadFromJsonAsync<Guid>();
+
+            await client.PostAsJsonAsync($"/api/todo/{firstTodoId}/start", "");
+
+            await client.PostAsJsonAsync($"/api/todo/{secondTodoId}/finish", "");
+
+            await client.DeleteAsync($"/api/todo/{firstTodoId}");
+
+            var history = await client.GetFromJsonAsync<List<TodoHistoryItem>>("/api/todo/history");
+
+            DeepAssert.Equal(new List<TodoHistoryItem>{
+                new TodoHistoryItem("Item created: First todo"),
+                new TodoHistoryItem("Item finished: First todo"),
+                new TodoHistoryItem("Item created: Second todo"),
+                new TodoHistoryItem("Item restarted: First todo"),
+                new TodoHistoryItem("Item finished: Second todo"),
+                new TodoHistoryItem("Item deleted: First todo"),
+            }, history);
+        }
     }
 }
 

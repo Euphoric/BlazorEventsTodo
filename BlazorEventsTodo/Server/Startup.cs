@@ -32,6 +32,8 @@ namespace BlazorEventsTodo.Server
 
             services.AddSingleton<TodoListProjection>();
             services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<TodoListProjection>>();
+            services.AddSingleton<TodoHistoryProjection>();
+            services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<TodoHistoryProjection>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

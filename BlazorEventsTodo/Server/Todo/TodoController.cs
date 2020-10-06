@@ -11,13 +11,15 @@ namespace BlazorEventsTodo.Todo
     [Route("api/[controller]")]
     public class TodoController : Controller
     {
-        private IEventStore _eventStore;
-        private TodoListProjection _todoListProjection;
+        private readonly IEventStore _eventStore;
+        private readonly TodoListProjection _todoListProjection;
+        private readonly TodoHistoryProjection _todoHistoryProjection;
 
-        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection)
+        public TodoController(IEventStore eventStore, TodoListProjection todoListProjection, TodoHistoryProjection todoHistoryProjection)
         {
             _eventStore = eventStore;
             _todoListProjection = todoListProjection;
+            _todoHistoryProjection = todoHistoryProjection;
         }
 
         [HttpGet]
@@ -74,6 +76,12 @@ namespace BlazorEventsTodo.Todo
             }
 
             return Ok();
+        }
+
+        [HttpGet("history")]
+        public IEnumerable<TodoHistoryItem> History()
+        {
+            return _todoHistoryProjection.History();
         }
     }
 }
