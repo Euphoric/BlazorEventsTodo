@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NodaTime;
+using System;
 
 namespace BlazorEventsTodo.EventStorage
 {
@@ -20,6 +21,7 @@ namespace BlazorEventsTodo.EventStorage
         ulong Version { get; }
         string AggregateKey { get; }
         string EventName { get; }
+        Instant Created { get; }
         TEvent Data { get; }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NodaTime;
+using System;
 using System.Text.Json;
 
 namespace BlazorEventsTodo.EventStorage
@@ -15,23 +16,25 @@ namespace BlazorEventsTodo.EventStorage
         private class DomainEvent<TData> : IDomainEvent<TData>
             where TData : IDomainEventData
         {
-            public DomainEvent(Guid id, ulong version, TData data, string eventName)
+            public DomainEvent(Guid id, ulong version, TData data, string eventName, Instant created)
             {
                 Id = id;
                 Version = version;
                 Data = data;
                 EventName = eventName;
+                Created = created;
             }
 
             public Guid Id { get; }
             public ulong Version { get; }
             public TData Data { get; }
             public string EventName { get; }
+            public Instant Created { get; }
 
             public string AggregateKey => Data.GetAggregateKey();
         }
 
-        public IDomainEvent<IDomainEventData> DeserializeFromData(Guid id, ulong version, string eventName, string dataJson)
+        public IDomainEvent<IDomainEventData> DeserializeFromData(Guid id, ulong version, string eventName, Instant created, string dataJson)
         {
             var eventType = _eventTypeLocator.GetClrType(eventName);
 
@@ -43,16 +46,16 @@ namespace BlazorEventsTodo.EventStorage
             var data = JsonSerializer.Deserialize(dataJson, eventType);
 
             var domainEventContainerType = typeof(DomainEvent<>).MakeGenericType(eventType);
-            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, version, data, eventName });
+            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, version, data, eventName, created });
         }
 
-        public IDomainEvent<IDomainEventData> CreateEvent(ulong version, IDomainEventData eventData)
+        public IDomainEvent<IDomainEventData> CreateEvent(ulong version, Instant created, IDomainEventData eventData)
         {
             var eventType = eventData.GetType();
             var id = Guid.NewGuid();
             var eventName = EventName(eventData);
             var domainEventContainerType = typeof(DomainEvent<>).MakeGenericType(eventType);
-            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, version, eventData, eventName });
+            return (IDomainEvent<IDomainEventData>)Activator.CreateInstance(domainEventContainerType, args: new object[] { id, version, eventData, eventName, created });
         }
 
         public string EventName(IDomainEventData eventData)

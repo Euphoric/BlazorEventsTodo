@@ -1,6 +1,7 @@
 ﻿using EventStore.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,7 +106,8 @@ namespace BlazorEventsTodo.EventStorage
         {
             EventRecord evnt = resolvedEvent.Event;
             var dataJson = Encoding.UTF8.GetString(evnt.Data.Span);
-            var @event = _eventFactory.DeserializeFromData(evnt.EventId.ToGuid(), evnt.EventNumber.ToUInt64(), evnt.EventType, dataJson);
+            Instant created = Instant.FromDateTimeUtc(evnt.Created);
+            var @event = _eventFactory.DeserializeFromData(evnt.EventId.ToGuid(), evnt.EventNumber.ToUInt64(), evnt.EventType, created, dataJson);
             return @event;
         }
 

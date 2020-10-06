@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NodaTime;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,7 +34,8 @@ namespace BlazorEventsTodo.EventStorage
         {
             var eventData = newEvent.Data;
             var eventVersion = _events.Where(x=>x.AggregateKey == eventData.GetAggregateKey()).Select(x=>(ulong?)x.Version).Max(x=>x) ?? 0;
-            var @event = _eventFactory.CreateEvent(eventVersion, eventData);
+            Instant created = SystemClock.Instance.GetCurrentInstant();
+            var @event = _eventFactory.CreateEvent(eventVersion, created, eventData);
 
             _events.Add(@event);
             _sender.SendEvent(@event);

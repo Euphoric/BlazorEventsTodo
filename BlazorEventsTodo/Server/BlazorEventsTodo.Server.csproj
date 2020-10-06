@@ -10,6 +10,7 @@
 		<PackageReference Include="EventStore.Client.Grpc" Version="20.6.1" />
 		<PackageReference Include="EventStore.Client.Grpc.Streams" Version="20.6.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.0-rc.1.20451.17" />
+		<PackageReference Include="NodaTime" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
