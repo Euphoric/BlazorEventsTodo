@@ -93,8 +93,17 @@ namespace BlazorEventsTodo.EventStorage
                 return Task.CompletedTask;
             }
 
-            IDomainEvent<IDomainEventData> @event = ParseEvent(evnt);
-
+            IDomainEvent<IDomainEventData> @event;
+            try
+            {
+                @event = ParseEvent(evnt);
+            }
+            catch
+            {
+                // TODO: Properly handle this case
+                _logger.LogWarning("Unknown event name: {eventName}", evnt.Event.EventType);
+                return Task.CompletedTask;
+            }
             _logger.LogDebug("Processed event {position}|{type}.", evnt.OriginalPosition, evnt.Event.EventType);
 
             _sender.SendEvent(@event);
