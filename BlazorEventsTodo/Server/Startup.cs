@@ -37,13 +37,13 @@ namespace BlazorEventsTodo.Server
             services.AddSingleton<DomainEventSender>();
             services.AddSingleton<DomainEventFactory>();
 
-            services.AddSingleton(new ProjectionContainer<TodoItemDomainEvent, TodoListProjection.State>(new TodoListProjection()));
-            services.AddSingleton<IProjectionState<TodoListProjection.State>>(sp => sp.GetRequiredService<ProjectionContainer<TodoItemDomainEvent, TodoListProjection.State>>());
-            services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<ProjectionContainer<TodoItemDomainEvent, TodoListProjection.State>>>();
+            services.AddSingleton<ProjectionContainer<TodoItemDomainEvent, TodoListProjection>>();
+            services.AddSingleton<IProjectionState<TodoListProjection>>(sp => sp.GetRequiredService<ProjectionContainer<TodoItemDomainEvent, TodoListProjection>>());
+            services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<ProjectionContainer<TodoItemDomainEvent, TodoListProjection>>>();
 
-            services.AddSingleton(new ProjectionContainer<TodoItemDomainEvent, TodoHistoryProjection.State>(new TodoHistoryProjection()));
-            services.AddSingleton<IProjectionState<TodoHistoryProjection.State>>(sp => sp.GetRequiredService<ProjectionContainer<TodoItemDomainEvent, TodoHistoryProjection.State>>());
-            services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<ProjectionContainer<TodoItemDomainEvent, TodoHistoryProjection.State>>>();
+            services.AddSingleton<ProjectionContainer<TodoItemDomainEvent, TodoHistoryProjection>>();
+            services.AddSingleton<IProjectionState<TodoHistoryProjection>>(sp => sp.GetRequiredService<ProjectionContainer<TodoItemDomainEvent, TodoHistoryProjection>>());
+            services.AddSingleton<IDomainEventListener, DomainEventListenerWrapper<ProjectionContainer<TodoItemDomainEvent, TodoHistoryProjection>>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

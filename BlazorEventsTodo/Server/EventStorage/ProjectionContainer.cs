@@ -1,21 +1,15 @@
 ﻿namespace BlazorEventsTodo.EventStorage
 {
-    public class ProjectionContainer<TEvent, TState> : IDomainEventListener<TEvent>, IProjectionState<TState>
+    public class ProjectionContainer<TEvent, TProjection> : IDomainEventListener<TEvent>, IProjectionState<TProjection>
         where TEvent : IDomainEventData
-        where TState : new()
+        where TProjection : IProjection<TEvent, TProjection>, new()
     {
-        private readonly IProjection<TEvent, TState> _projection;
-        TState _state = new TState();
-        public TState State { get => _state; }
-
-        public ProjectionContainer(IProjection<TEvent, TState> projection)
-        {
-            _projection = projection;
-        }
+        TProjection _state = new TProjection();
+        public TProjection State { get => _state; }
 
         public void Handle(IDomainEvent<TEvent> evnt)
         {
-            _state = _projection.UpdateState(_state, evnt);
+            _state = State.NextState(evnt);
         }
     }
 }

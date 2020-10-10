@@ -12,10 +12,10 @@ namespace BlazorEventsTodo.Todo
     public class TodoController : Controller
     {
         private readonly IEventStore _eventStore;
-        private readonly IProjectionState<TodoListProjection.State> _todoListProjection;
-        private readonly IProjectionState<TodoHistoryProjection.State> _todoHistoryProjection;
+        private readonly IProjectionState<TodoListProjection> _todoListProjection;
+        private readonly IProjectionState<TodoHistoryProjection> _todoHistoryProjection;
 
-        public TodoController(IEventStore eventStore, IProjectionState<TodoListProjection.State> todoListProjection, IProjectionState<TodoHistoryProjection.State> todoHistoryProjection)
+        public TodoController(IEventStore eventStore, IProjectionState<TodoListProjection> todoListProjection, IProjectionState<TodoHistoryProjection> todoHistoryProjection)
         {
             _eventStore = eventStore;
             _todoListProjection = todoListProjection;
