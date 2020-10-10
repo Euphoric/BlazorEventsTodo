@@ -6,26 +6,20 @@ using System.Linq;
 
 namespace BlazorEventsTodo.Todo
 {
-    public class TodoHistoryProjection : IDomainEventListener<TodoItemDomainEvent>
+    public class TodoHistoryProjection : IProjection<TodoItemDomainEvent, TodoHistoryProjection.State>
     {
-        record State
+        public record State
         {
             public ImmutableList<TodoHistoryItem> HistoryItems { get; init; } = ImmutableList<TodoHistoryItem>.Empty;
             public ImmutableDictionary<Guid, string> TodoTitles { get; init; } = ImmutableDictionary<Guid, string>.Empty;
+
+            internal IEnumerable<TodoHistoryItem> History()
+            {
+                return HistoryItems.ToList();
+            }
         }
 
-        State _state = new State();
-
-        public void Handle(IDomainEvent<TodoItemDomainEvent> evnt)
-        {
-            var previousState = _state;
-
-            State newState = UpdateState(previousState, evnt);
-
-            _state = newState;
-        }
-
-        private State UpdateState(State previousState, IDomainEvent<TodoItemDomainEvent> evnt)
+        public State UpdateState(State previousState, IDomainEvent<TodoItemDomainEvent> evnt)
         {
             switch (evnt.Data)
             {
@@ -38,26 +32,21 @@ namespace BlazorEventsTodo.Todo
                 case TodoItemDeleted deleted:
                     return previousState with
                     {
-                        HistoryItems = previousState.HistoryItems.Add(new TodoHistoryItem("Item deleted: " + _state.TodoTitles[deleted.Id], evnt.Created)),
+                        HistoryItems = previousState.HistoryItems.Add(new TodoHistoryItem("Item deleted: " + previousState.TodoTitles[deleted.Id], evnt.Created)),
                     };
                 case TodoItemFinished finished:
                     return previousState with
                     {
-                        HistoryItems = previousState.HistoryItems.Add(new TodoHistoryItem("Item finished: " + _state.TodoTitles[finished.Id], evnt.Created)),
+                        HistoryItems = previousState.HistoryItems.Add(new TodoHistoryItem("Item finished: " + previousState.TodoTitles[finished.Id], evnt.Created)),
                     };
                 case TodoItemStarted started:
                     return previousState with
                     {
-                        HistoryItems = previousState.HistoryItems.Add(new TodoHistoryItem("Item restarted: " + _state.TodoTitles[started.Id], evnt.Created)),
+                        HistoryItems = previousState.HistoryItems.Add(new TodoHistoryItem("Item restarted: " + previousState.TodoTitles[started.Id], evnt.Created)),
                     };
                 default:
                     return previousState;
             }
-        }
-
-        internal IEnumerable<TodoHistoryItem> History()
-        {
-            return _state.HistoryItems.ToList();
         }
     }
 }

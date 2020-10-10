@@ -5,25 +5,19 @@ using System.Collections.Immutable;
 
 namespace BlazorEventsTodo.Todo
 {
-    public class TodoListProjection : IDomainEventListener<TodoItemDomainEvent>
+    public class TodoListProjection : IProjection<TodoItemDomainEvent, TodoListProjection.State>
     {
-        record State
+        public record State
         {
             public ImmutableDictionary<Guid, TodoItem> TodoItems { get; init; } = ImmutableDictionary<Guid, TodoItem>.Empty;
+
+            public IEnumerable<TodoItem> TodoList()
+            {
+                return TodoItems.Values;
+            }
         }
 
-        State _state = new State();
-
-        public void Handle(IDomainEvent<TodoItemDomainEvent> evntCont)
-        {
-            var previousState = _state;
-
-            State newState = UpdateState(previousState, evntCont);
-
-            _state = newState;
-        }
-
-        private static State UpdateState(State previousState, IDomainEvent<TodoItemDomainEvent> evnt)
+        public State UpdateState(State previousState, IDomainEvent<TodoItemDomainEvent> evnt)
         {
             switch (evnt.Data)
             {
@@ -39,11 +33,6 @@ namespace BlazorEventsTodo.Todo
                 default:
                     return previousState;
             }
-        }
-
-        public IEnumerable<TodoItem> TodoList()
-        {
-            return _state.TodoItems.Values;
         }
     }
 }
