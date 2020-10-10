@@ -3,8 +3,8 @@
     public interface IProjectionContainerFactory
     {
         IProjectionState<TProjection> CreateProjectionState<TProjection>()
-            where TProjection : IProjection<TProjection>, new();
+            where TProjection : IProjection, new();
         IDomainEventListener CreateProjectionListener<TProjection>()
-            where TProjection : IProjection<TProjection>, new();
+            where TProjection : IProjection, new();
     }
 }

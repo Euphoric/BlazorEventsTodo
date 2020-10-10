@@ -10,7 +10,7 @@ namespace BlazorEventsTodo.EventStorage
         Dictionary<Type, object> _projectionContainers = new Dictionary<Type, object>();
 
         private ThreadedProjectionContainer<TProjection> CreateProjection<TProjection>()
-            where TProjection : IProjection<TProjection>, new()
+            where TProjection : IProjection, new()
         {
             if (_projectionContainers.TryGetValue(typeof(TProjection), out object projection))
             {
@@ -23,27 +23,27 @@ namespace BlazorEventsTodo.EventStorage
         }
 
         public IDomainEventListener CreateProjectionListener<TProjection>()
-            where TProjection : IProjection<TProjection>, new()
+            where TProjection : IProjection, new()
         {
             return CreateProjection<TProjection>();
         }
 
         public IProjectionState<TProjection> CreateProjectionState<TProjection>()
-            where TProjection : IProjection<TProjection>, new()
+            where TProjection : IProjection, new()
         {
             return CreateProjection<TProjection>();
         }
     }
 
     public class ThreadedProjectionContainer<TProjection> : IDomainEventListener, IProjectionState<TProjection>
-        where TProjection : IProjection<TProjection>, new()
+        where TProjection : IProjection, new()
     {
         private readonly Thread _thread;
         private readonly BlockingCollection<IDomainEvent<IDomainEventData>> _eventQueue = new BlockingCollection<IDomainEvent<IDomainEventData>>(new ConcurrentQueue<IDomainEvent<IDomainEventData>>());
 
-        TProjection _state = new TProjection();
+        IProjection _state = new TProjection();
 
-        public TProjection State { get => _state; }
+        public TProjection State { get => (TProjection)_state; }
 
         public ThreadedProjectionContainer()
         {

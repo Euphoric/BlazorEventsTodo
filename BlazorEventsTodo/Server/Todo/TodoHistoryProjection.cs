@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace BlazorEventsTodo.Todo
 {
-    public record TodoHistoryProjection : IProjection<TodoHistoryProjection>
+    public record TodoHistoryProjection : IProjection
     {
         ImmutableList<TodoHistoryItem> HistoryItems { get; init; } = ImmutableList<TodoHistoryItem>.Empty;
         ImmutableDictionary<Guid, string> TodoTitles { get; init; } = ImmutableDictionary<Guid, string>.Empty;
@@ -16,7 +16,7 @@ namespace BlazorEventsTodo.Todo
             return HistoryItems.ToList();
         }
 
-        public TodoHistoryProjection NextState(IDomainEvent<IDomainEventData> evnt)
+        public IProjection NextState(IDomainEvent<IDomainEventData> evnt)
         {
             switch (evnt.Data)
             {

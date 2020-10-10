@@ -8,7 +8,7 @@ namespace BlazorEventsTodo.EventStorage
         Dictionary<Type, object> _projectionContainers = new Dictionary<Type, object>();
 
         private ProjectionContainer<TProjection> CreateProjection<TProjection>()
-            where TProjection : IProjection<TProjection>, new()
+            where TProjection : IProjection, new() 
         {
             if (_projectionContainers.TryGetValue(typeof(TProjection), out object projection))
             {
@@ -21,23 +21,23 @@ namespace BlazorEventsTodo.EventStorage
         }
 
         public IDomainEventListener CreateProjectionListener<TProjection>()
-            where TProjection : IProjection<TProjection>, new()
+            where TProjection : IProjection, new()
         {
             return CreateProjection<TProjection>();
         }
 
         public IProjectionState<TProjection> CreateProjectionState<TProjection>()
-            where TProjection : IProjection<TProjection>, new()
+            where TProjection : IProjection, new()
         {
             return CreateProjection<TProjection>();
         }
     }
 
     public class ProjectionContainer<TProjection> : IDomainEventListener, IProjectionState<TProjection>
-        where TProjection : IProjection<TProjection>, new()
+        where TProjection : IProjection, new()
     {
-        TProjection _state = new TProjection();
-        public TProjection State { get => _state; }
+        IProjection _state = new TProjection();
+        public TProjection State { get => (TProjection)_state; }
 
         public void Handle(IDomainEvent<IDomainEventData> evnt)
         {
