@@ -1,9 +1,8 @@
 ﻿namespace BlazorEventsTodo.EventStorage
 {
-    public interface IProjection<TEvent, TProjection>
-        where TEvent : IDomainEventData
+    public interface IProjection<TProjection>
         where TProjection : new()
     {
-        TProjection NextState(IDomainEvent<TEvent> evnt);
+        TProjection NextState(IDomainEvent<IDomainEventData> evnt);
     }
 }

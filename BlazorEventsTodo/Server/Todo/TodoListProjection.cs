@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace BlazorEventsTodo.Todo
 {
-    public record TodoListProjection : IProjection<TodoItemDomainEvent, TodoListProjection>
+    public record TodoListProjection : IProjection<TodoListProjection>
     {
         ImmutableDictionary<Guid, TodoItem> TodoItems { get; init; } = ImmutableDictionary<Guid, TodoItem>.Empty;
 
@@ -14,7 +14,7 @@ namespace BlazorEventsTodo.Todo
             return TodoItems.Values;
         }
 
-        public TodoListProjection NextState(IDomainEvent<TodoItemDomainEvent> evnt)
+        public TodoListProjection NextState(IDomainEvent<IDomainEventData> evnt)
         {
             switch (evnt.Data)
             {

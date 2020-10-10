@@ -3,12 +3,11 @@ using System.Threading;
 
 namespace BlazorEventsTodo.EventStorage
 {
-    public class ThreadedProjectionContainer<TEvent, TProjection> : IDomainEventListener<TEvent>, IProjectionState<TProjection>
-        where TEvent : IDomainEventData
-        where TProjection : IProjection<TEvent, TProjection>, new()
+    public class ThreadedProjectionContainer<TProjection> : IDomainEventListener, IProjectionState<TProjection>
+        where TProjection : IProjection<TProjection>, new()
     {
         private readonly Thread _thread;
-        private readonly BlockingCollection<IDomainEvent<TEvent>> _eventQueue = new BlockingCollection<IDomainEvent<TEvent>>(new ConcurrentQueue<IDomainEvent<TEvent>>());
+        private readonly BlockingCollection<IDomainEvent<IDomainEventData>> _eventQueue = new BlockingCollection<IDomainEvent<IDomainEventData>>(new ConcurrentQueue<IDomainEvent<IDomainEventData>>());
 
         TProjection _state = new TProjection();
 
@@ -29,7 +28,7 @@ namespace BlazorEventsTodo.EventStorage
             }
         }
 
-        public void Handle(IDomainEvent<TEvent> evnt)
+        public void Handle(IDomainEvent<IDomainEventData> evnt)
         {
             _eventQueue.Add(evnt);
         }
