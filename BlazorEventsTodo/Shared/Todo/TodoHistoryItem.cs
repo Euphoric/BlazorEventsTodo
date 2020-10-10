@@ -2,7 +2,7 @@
 
 namespace BlazorEventsTodo.Todo
 {
-    public class TodoHistoryItem
+    public record TodoHistoryItem
     {
         public TodoHistoryItem(string description, Instant changed)
         {

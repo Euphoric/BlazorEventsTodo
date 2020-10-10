@@ -2,7 +2,7 @@
 
 namespace BlazorEventsTodo.Todo
 {
-    public class TodoItem
+    public record TodoItem
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

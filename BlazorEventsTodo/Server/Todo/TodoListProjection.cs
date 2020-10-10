@@ -1,42 +1,49 @@
 ﻿using BlazorEventsTodo.EventStorage;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace BlazorEventsTodo.Todo
 {
     public class TodoListProjection : IDomainEventListener<TodoItemDomainEvent>
     {
-        Dictionary<Guid, TodoItem> _todoItems = new Dictionary<Guid, TodoItem>();
+        record State
+        {
+            public ImmutableDictionary<Guid, TodoItem> TodoItems { get; init; } = ImmutableDictionary<Guid, TodoItem>.Empty;
+        }
+
+        State _state = new State();
 
         public void Handle(IDomainEvent<TodoItemDomainEvent> evntCont)
         {
-            switch (evntCont.Data)
+            var previousState = _state;
+
+            State newState = UpdateState(previousState, evntCont);
+
+            _state = newState;
+        }
+
+        private static State UpdateState(State previousState, IDomainEvent<TodoItemDomainEvent> evnt)
+        {
+            switch (evnt.Data)
             {
                 case TodoItemCreated created:
-                    _todoItems[created.Id] = new TodoItem() { Id = created.Id, Title = created.Title };
-                    break;
+                    var newItem = new TodoItem() { Id = created.Id, Title = created.Title };
+                    return previousState with { TodoItems = previousState.TodoItems.Add(created.Id, newItem) };
                 case TodoItemDeleted deleted:
-                    _todoItems.Remove(deleted.Id);
-                    break;
+                    return previousState with { TodoItems = previousState.TodoItems.Remove(deleted.Id) };
                 case TodoItemFinished finished:
-                    _todoItems[finished.Id].IsFinished = true;
-                    break;
+                    return previousState with { TodoItems = previousState.TodoItems.Update(finished.Id, item => item with { IsFinished = true }) };
                 case TodoItemStarted started:
-                    _todoItems[started.Id].IsFinished = false;
-                    break;
+                    return previousState with { TodoItems = previousState.TodoItems.Update(started.Id, item => item with { IsFinished = false }) };
                 default:
-                    break;
+                    return previousState;
             }
         }
 
         public IEnumerable<TodoItem> TodoList()
         {
-            return _todoItems.Values;
-        }
-
-        internal bool TodoExists(Guid id)
-        {
-            return _todoItems.ContainsKey(id);
+            return _state.TodoItems.Values;
         }
     }
 }
