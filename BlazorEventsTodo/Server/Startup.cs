@@ -37,13 +37,13 @@ namespace BlazorEventsTodo.Server
             services.AddSingleton<DomainEventSender>();
             services.AddSingleton<DomainEventFactory>();
 
-            services.AddSingleton<ProjectionContainer<TodoListProjection>>();
-            services.AddSingleton<IProjectionState<TodoListProjection>>(sp => sp.GetRequiredService<ProjectionContainer<TodoListProjection>>());
-            services.AddSingleton<IDomainEventListener>(sp => sp.GetRequiredService<ProjectionContainer<TodoListProjection>>());
+            services.AddSingleton<IProjectionContainerFactory, ThreadedProjectionContainerFactory>();
 
-            services.AddSingleton<ProjectionContainer<TodoHistoryProjection>>();
-            services.AddSingleton<IProjectionState<TodoHistoryProjection>>(sp => sp.GetRequiredService<ProjectionContainer<TodoHistoryProjection>>());
-            services.AddSingleton<IDomainEventListener>(sp => sp.GetRequiredService<ProjectionContainer<TodoHistoryProjection>>());
+            services.AddSingleton(sp => sp.GetRequiredService<IProjectionContainerFactory>().CreateProjectionState<TodoListProjection>());
+            services.AddSingleton(sp => sp.GetRequiredService<IProjectionContainerFactory>().CreateProjectionListener<TodoListProjection>());
+
+            services.AddSingleton(sp => sp.GetRequiredService<IProjectionContainerFactory>().CreateProjectionState<TodoHistoryProjection>());
+            services.AddSingleton(sp => sp.GetRequiredService<IProjectionContainerFactory>().CreateProjectionListener<TodoHistoryProjection>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

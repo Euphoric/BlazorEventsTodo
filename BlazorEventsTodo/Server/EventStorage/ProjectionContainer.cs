@@ -1,5 +1,38 @@
-﻿namespace BlazorEventsTodo.EventStorage
+﻿using System;
+using System.Collections.Generic;
+
+namespace BlazorEventsTodo.EventStorage
 {
+    public class SynchronousProjectionContainerFactory : IProjectionContainerFactory
+    {
+        Dictionary<Type, object> _projectionContainers = new Dictionary<Type, object>();
+
+        private ProjectionContainer<TProjection> CreateProjection<TProjection>()
+            where TProjection : IProjection<TProjection>, new()
+        {
+            if (_projectionContainers.TryGetValue(typeof(TProjection), out object projection))
+            {
+                return (ProjectionContainer<TProjection>)projection;
+            }
+
+            ProjectionContainer<TProjection> container = new ProjectionContainer<TProjection>();
+            _projectionContainers[typeof(TProjection)] = container;
+            return container;
+        }
+
+        public IDomainEventListener CreateProjectionListener<TProjection>()
+            where TProjection : IProjection<TProjection>, new()
+        {
+            return CreateProjection<TProjection>();
+        }
+
+        public IProjectionState<TProjection> CreateProjectionState<TProjection>()
+            where TProjection : IProjection<TProjection>, new()
+        {
+            return CreateProjection<TProjection>();
+        }
+    }
+
     public class ProjectionContainer<TProjection> : IDomainEventListener, IProjectionState<TProjection>
         where TProjection : IProjection<TProjection>, new()
     {

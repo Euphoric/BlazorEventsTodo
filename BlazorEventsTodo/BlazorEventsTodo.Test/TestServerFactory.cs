@@ -17,6 +17,8 @@ namespace BlazorEventsTodo
             builder.ConfigureTestServices(services =>
             {
                 services.AddSingleton<IEventStore, EventStorage.EventStore>();
+                services.AddSingleton<IProjectionContainerFactory, SynchronousProjectionContainerFactory>();
+
                 services.AddSingleton<IClock>(new FakeClock(Instant.FromUtc(2020, 2, 3, 4, 5)));
             });
         }
