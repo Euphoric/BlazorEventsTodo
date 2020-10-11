@@ -14,23 +14,17 @@ namespace BlazorEventsTodo.Todo
 
         public TodoItemAggregate Update(IDomainEvent<TodoItemDomainEvent> evnt)
         {
-            TodoItemAggregate aggr = this;
             switch (evnt.Data)
             {
                 case TodoItemDeleted:
-                    aggr = aggr with { IsDeleted = true };
-                    break;
+                    return this with { IsDeleted = true };
                 case TodoItemFinished:
-                    aggr = aggr with { IsFinished = true };
-                    break;
+                    return this with { IsFinished = true };
                 case TodoItemStarted:
-                    aggr = aggr with { IsFinished = false };
-                    break;
+                    return this with { IsFinished = false };
                 default:
                     throw new NotSupportedException("Unknown event type.");
             }
-
-            return aggr;
         }
 
         #endregion
