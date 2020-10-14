@@ -3,13 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30516.212
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorEventsTodo.Server", "BlazorEventsTodo\Server\BlazorEventsTodo.Server.csproj", "{905007BC-3535-4E92-B265-180CDA9CBCE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorEventsTodo.Server", "BlazorEventsTodo\Server\BlazorEventsTodo.Server.csproj", "{905007BC-3535-4E92-B265-180CDA9CBCE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorEventsTodo.Client", "BlazorEventsTodo\Client\BlazorEventsTodo.Client.csproj", "{8667B54B-DC3A-400E-A4D3-F497353F4B76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorEventsTodo.Client", "BlazorEventsTodo\Client\BlazorEventsTodo.Client.csproj", "{8667B54B-DC3A-400E-A4D3-F497353F4B76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorEventsTodo.Shared", "BlazorEventsTodo\Shared\BlazorEventsTodo.Shared.csproj", "{11DE5F6C-E269-40F6-81DF-467E52C102DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorEventsTodo.Shared", "BlazorEventsTodo\Shared\BlazorEventsTodo.Shared.csproj", "{11DE5F6C-E269-40F6-81DF-467E52C102DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorEventsTodo.Test", "BlazorEventsTodo\BlazorEventsTodo.Test\BlazorEventsTodo.Test.csproj", "{94C5FB6C-41F5-45CE-8F52-83E1C46AD797}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorEventsTodo.Test", "BlazorEventsTodo\BlazorEventsTodo.Test\BlazorEventsTodo.Test.csproj", "{94C5FB6C-41F5-45CE-8F52-83E1C46AD797}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EC0807C9-21BA-4A80-8577-566FB26D4B99}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.runlocal.yml = docker-compose.runlocal.yml
+		Dockerfile = Dockerfile
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

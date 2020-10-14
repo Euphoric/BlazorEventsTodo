@@ -11,9 +11,6 @@ using System.Threading.Tasks;
 
 namespace BlazorEventsTodo.EventStorage
 {
-    /// <summary>
-    /// Requires EventStore v20.6.0, run with --dev parameter at the moment.
-    /// </summary>
     public class PersistentEventStore : IEventStore, IDisposable
     {
         private DomainEventSender _sender;

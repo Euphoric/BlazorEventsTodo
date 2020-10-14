@@ -13,6 +13,6 @@ Then open https://localhost:2111 for EventStore admin page or http://localhost:8
 
 Tested to run against EventSourceDB 20.6.1
 
-Due to [bug](https://github.com/EventStore/EventStore/issues/2707) EventSourceDB cannot be run in `--insecure` mode, so set it up using certificates for TLS.
+Default configuration is for EventSourceDB running in `--insecure` mode. To run in secured mode with certificates, update the connection string in `appsettings.Development.json` file.
 
 Then open the solution using favorite C# editor.
