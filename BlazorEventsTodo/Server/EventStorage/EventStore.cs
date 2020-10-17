@@ -14,10 +14,10 @@ namespace BlazorEventsTodo.EventStorage
 
     public static class EventStoreExtensions
     {
-        public static IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(this IEventStore eventStore, string aggregateKey)
+        public static IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(this IEventStore eventStore, IAggregateKey aggregateKey)
             where TEvent : IDomainEventData
         {
-            return eventStore.GetAggregateEvents(aggregateKey).Cast<IDomainEvent<TEvent>>();
+            return eventStore.GetAggregateEvents(aggregateKey.Value).Cast<IDomainEvent<TEvent>>();
         }
     }
 

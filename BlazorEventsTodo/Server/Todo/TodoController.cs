@@ -41,7 +41,7 @@ namespace BlazorEventsTodo.Todo
         {
             var itemId = new EntityId(id);
             TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
-            var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey.Value).ToListAsync());
+            var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey).ToListAsync());
             var evnt = aggregate.Delete();
             await _eventStore.Store(evnt);
         }
@@ -53,7 +53,7 @@ namespace BlazorEventsTodo.Todo
             {
                 var itemId = new EntityId(id);
                 TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
-                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey.Value).ToListAsync());
+                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey).ToListAsync());
                 var evnt = aggregate.Finish();
                 await _eventStore.Store(evnt);
             }
@@ -72,7 +72,7 @@ namespace BlazorEventsTodo.Todo
             {
                 var itemId = new EntityId(id);
                 TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
-                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey.Value).ToListAsync());
+                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey).ToListAsync());
                 var evnt = aggregate.Start();
                 await _eventStore.Store(evnt);
             }
