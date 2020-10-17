@@ -14,10 +14,16 @@ namespace BlazorEventsTodo.EventStorage
 
     public static class EventStoreExtensions
     {
-        public static IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(this IEventStore eventStore, IAggregateKey aggregateKey)
-            where TEvent : IDomainEventData
+        public static IAsyncEnumerable<IDomainEvent<IDomainEventData>> GetAggregateEvents<TAggregate>(this IEventStore eventStore, IAggregateKey<TAggregate> aggregateKey)
+            where TAggregate : Aggregate
         {
-            return eventStore.GetAggregateEvents(aggregateKey.Value).Cast<IDomainEvent<TEvent>>();
+            return eventStore.GetAggregateEvents(aggregateKey.Value);
+        }
+
+        public static async Task<TAggregate> RetrieveAggregate<TAggregate>(this IEventStore eventStore, IAggregateKey<TAggregate> aggregateKey)
+            where TAggregate : Aggregate
+        {
+            return AggregateBuilder<TAggregate>.Rehydrate(await eventStore.GetAggregateEvents(aggregateKey).ToListAsync());
         }
     }
 
@@ -43,7 +49,7 @@ namespace BlazorEventsTodo.EventStorage
         public Task Store(ICreateEvent<IDomainEventData> newEvent)
         {
             var eventData = newEvent.Data;
-            var eventVersion = _events.Where(x=>x.AggregateKey == eventData.GetAggregateKey()).Select(x=>(ulong?)x.Version).Max(x=>x) ?? 0;
+            var eventVersion = _events.Where(x => x.AggregateKey == eventData.GetAggregateKey()).Select(x => (ulong?)x.Version).Max(x => x) ?? 0;
             Instant created = _clock.GetCurrentInstant();
             var @event = _eventFactory.CreateEvent(eventVersion, created, eventData);
 

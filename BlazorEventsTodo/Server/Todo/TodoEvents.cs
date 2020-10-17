@@ -3,7 +3,7 @@ using System;
 
 namespace BlazorEventsTodo.Todo
 {
-    public record TodoItemKey(Guid id) : IAggregateKey
+    public record TodoItemKey(Guid id) : IAggregateKey<TodoItemAggregate>
     {
         const string Prefix = "todo-";
 
