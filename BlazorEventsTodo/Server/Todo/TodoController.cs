@@ -29,7 +29,7 @@ namespace BlazorEventsTodo.Todo
         }
 
         [HttpPost]
-        public async Task<Guid> Post(CreateTodo create)
+        public async Task<EntityId> Post(CreateTodo create)
         {
             var evnt = TodoItemAggregate.New(create.Title);
             await _eventStore.Store(evnt);
@@ -37,19 +37,23 @@ namespace BlazorEventsTodo.Todo
         }
 
         [HttpDelete("{id}")]
-        public async Task Delete(Guid id)
+        public async Task Delete(string id)
         {
-            var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+            var itemId = new EntityId(id);
+            TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
+            var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey.Value).ToListAsync());
             var evnt = aggregate.Delete();
             await _eventStore.Store(evnt);
         }
 
         [HttpPost("{id}/finish")]
-        public async Task<IActionResult> Finish(Guid id)
+        public async Task<IActionResult> Finish(string id)
         {
             try
             {
-                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+                var itemId = new EntityId(id);
+                TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
+                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey.Value).ToListAsync());
                 var evnt = aggregate.Finish();
                 await _eventStore.Store(evnt);
             }
@@ -62,11 +66,13 @@ namespace BlazorEventsTodo.Todo
         }
 
         [HttpPost("{id}/start")]
-        public async Task<IActionResult> Start(Guid id)
+        public async Task<IActionResult> Start(string id)
         {
             try
             {
-                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>("todo-" + id).ToListAsync());
+                var itemId = new EntityId(id);
+                TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
+                var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(await _eventStore.GetAggregateEvents<TodoItemDomainEvent>(aggregateKey.Value).ToListAsync());
                 var evnt = aggregate.Start();
                 await _eventStore.Store(evnt);
             }

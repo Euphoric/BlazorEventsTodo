@@ -35,7 +35,7 @@ namespace BlazorEventsTodo
             var newTodo = new CreateTodo() { Title = "New todo" };
             var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
             postResponse.EnsureSuccessStatusCode();
-            var newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+            var newTodoId = await postResponse.Content.ReadFromJsonAsync<EntityId>();
 
             var response = await client.GetFromJsonAsync<List<TodoItem>>("/api/todo");
 
@@ -49,12 +49,12 @@ namespace BlazorEventsTodo
         {
             var client = _factory.CreateClient();
 
-            Guid newTodoId;
+            EntityId newTodoId;
             {
                 var newTodo = new CreateTodo() { Title = "New todo" };
                 var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
                 postResponse.EnsureSuccessStatusCode();
-                newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+                newTodoId = await postResponse.Content.ReadFromJsonAsync<EntityId>();
             }
 
             {
@@ -91,12 +91,12 @@ namespace BlazorEventsTodo
         {
             var client = _factory.CreateClient();
 
-            Guid newTodoId;
+            EntityId newTodoId;
             {
                 var newTodo = new CreateTodo() { Title = "New todo" };
                 var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
                 postResponse.EnsureSuccessStatusCode();
-                newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+                newTodoId = await postResponse.Content.ReadFromJsonAsync<EntityId>();
             }
 
             {
@@ -115,12 +115,12 @@ namespace BlazorEventsTodo
         {
             var client = _factory.CreateClient();
 
-            Guid newTodoId;
+            EntityId newTodoId;
             {
                 var newTodo = new CreateTodo() { Title = "New todo" };
                 var postResponse = await client.PostAsJsonAsync("/api/todo", newTodo);
                 postResponse.EnsureSuccessStatusCode();
-                newTodoId = await postResponse.Content.ReadFromJsonAsync<Guid>();
+                newTodoId = await postResponse.Content.ReadFromJsonAsync<EntityId>();
             }
 
             {
@@ -156,7 +156,7 @@ namespace BlazorEventsTodo
 
             var firstTodo = new CreateTodo() { Title = "First todo" };
             var firstPostResponse = await client.PostAsJsonAsync("/api/todo", firstTodo);
-            Guid firstTodoId = await firstPostResponse.Content.ReadFromJsonAsync<Guid>();
+            EntityId firstTodoId = await firstPostResponse.Content.ReadFromJsonAsync<EntityId>();
             _factory.Clock.AdvanceSeconds(1);
 
             await client.PostAsJsonAsync($"/api/todo/{firstTodoId}/finish", "");
@@ -164,7 +164,7 @@ namespace BlazorEventsTodo
 
             var secondTodo = new CreateTodo() { Title = "Second todo" };
             var secondPostResponse = await client.PostAsJsonAsync("/api/todo", secondTodo);
-            Guid secondTodoId = await secondPostResponse.Content.ReadFromJsonAsync<Guid>();
+            EntityId secondTodoId = await secondPostResponse.Content.ReadFromJsonAsync<EntityId>();
             _factory.Clock.AdvanceSeconds(1);
 
             await client.PostAsJsonAsync($"/api/todo/{firstTodoId}/start", "");

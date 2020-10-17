@@ -9,7 +9,7 @@ namespace BlazorEventsTodo.Todo
     public record TodoHistoryProjection : IProjection
     {
         ImmutableList<TodoHistoryItem> HistoryItems { get; init; } = ImmutableList<TodoHistoryItem>.Empty;
-        ImmutableDictionary<Guid, string> TodoTitles { get; init; } = ImmutableDictionary<Guid, string>.Empty;
+        ImmutableDictionary<TodoItemKey, string> TodoTitles { get; init; } = ImmutableDictionary<TodoItemKey, string>.Empty;
 
         public IEnumerable<TodoHistoryItem> History()
         {

@@ -7,7 +7,7 @@ namespace BlazorEventsTodo.Todo
 {
     public record TodoListProjection : IProjection
     {
-        ImmutableDictionary<Guid, TodoItem> TodoItems { get; init; } = ImmutableDictionary<Guid, TodoItem>.Empty;
+        ImmutableDictionary<TodoItemKey, TodoItem> TodoItems { get; init; } = ImmutableDictionary<TodoItemKey, TodoItem>.Empty;
 
         public IEnumerable<TodoItem> TodoList()
         {

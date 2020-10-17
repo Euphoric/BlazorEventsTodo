@@ -3,31 +3,57 @@ using System;
 
 namespace BlazorEventsTodo.Todo
 {
-    public abstract record TodoItemDomainEvent(Guid Id) : IDomainEventData
+    public record TodoItemKey(Guid id)
+    {
+        const string Prefix = "todo-";
+
+        public string Value => Prefix + id;
+
+        public static TodoItemKey Parse(string value)
+        {
+            if (!value.StartsWith(Prefix))
+            {
+                throw new Exception("Invalid aggregate key format");
+            }
+            var guidId = value.Substring(Prefix.Length);
+
+            return new TodoItemKey(Guid.Parse(guidId));
+        }
+
+        public static implicit operator EntityId(TodoItemKey key) => new EntityId(key.Value);
+        public static explicit operator TodoItemKey(EntityId id) => Parse(id.Value);
+
+        internal static TodoItemKey New()
+        {
+            return new TodoItemKey(Guid.NewGuid());
+        }
+    }
+
+    public abstract record TodoItemDomainEvent(TodoItemKey Id) : IDomainEventData
     {
         public string GetAggregateKey()
         {
-            return $"todo-{Id}";
+            return Id.Value;
         }
     }
 
     [DomainEvent("todo-item-created")]
-    public record TodoItemCreated(Guid Id, string Title) : TodoItemDomainEvent(Id)
+    public record TodoItemCreated(TodoItemKey Id, string Title) : TodoItemDomainEvent(Id)
     {
     }
 
     [DomainEvent("todo-item-deleted")]
-    public record TodoItemDeleted(Guid Id) : TodoItemDomainEvent(Id)
+    public record TodoItemDeleted(TodoItemKey Id) : TodoItemDomainEvent(Id)
     {
     }
 
     [DomainEvent("todo-item-finished")]
-    public record TodoItemFinished(Guid Id) : TodoItemDomainEvent(Id)
+    public record TodoItemFinished(TodoItemKey Id) : TodoItemDomainEvent(Id)
     {
     }
 
     [DomainEvent("todo-item-started")]
-    public record TodoItemStarted(Guid Id) : TodoItemDomainEvent(Id)
+    public record TodoItemStarted(TodoItemKey Id) : TodoItemDomainEvent(Id)
     {
     }
 }

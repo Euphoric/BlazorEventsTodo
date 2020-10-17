@@ -2,6 +2,7 @@ using BlazorEventsTodo.EventStorage;
 using BlazorEventsTodo.Todo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,7 +31,7 @@ namespace BlazorEventsTodo.Server
                     options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
                 });
             services.AddRazorPages();
-
+            
             services.AddSingleton<IClock>(SystemClock.Instance);
 
             services.AddSingleton<IEventStore, PersistentEventStore>();

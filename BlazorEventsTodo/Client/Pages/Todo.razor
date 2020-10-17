@@ -75,13 +75,13 @@
             newTodoTitle = string.Empty;
         }
 
-        private async Task DeleteTodo(Guid id)
+        private async Task DeleteTodo(EntityId id)
         {
             var res = await Http.DeleteAsync($"/api/todo/{id}");
             res.EnsureSuccessStatusCode();
         }
 
-        private async Task ToggleTaskFinished(Guid id, bool newValue)
+        private async Task ToggleTaskFinished(EntityId id, bool newValue)
         {
             var action = newValue ? "finish" : "start";
 

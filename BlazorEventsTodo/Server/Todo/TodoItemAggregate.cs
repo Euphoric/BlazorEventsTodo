@@ -3,7 +3,7 @@ using System;
 
 namespace BlazorEventsTodo.Todo
 {
-    public record TodoItemAggregate(Guid Id, string Title, bool IsDeleted, bool IsFinished) : Aggregate
+    public record TodoItemAggregate(TodoItemKey Id, string Title, bool IsDeleted, bool IsFinished) : Aggregate
     {
         #region Rehydrate
 
@@ -33,7 +33,7 @@ namespace BlazorEventsTodo.Todo
 
         public static ICreateEvent<TodoItemDomainEvent> New(string Title)
         {
-            Guid newId = Guid.NewGuid();
+            TodoItemKey newId = TodoItemKey.New();
             return new TodoItemCreated(newId, Title).AsNewAggregate();
         }
 
