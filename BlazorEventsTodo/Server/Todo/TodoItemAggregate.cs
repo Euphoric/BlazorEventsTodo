@@ -33,7 +33,7 @@ namespace BlazorEventsTodo.Todo
 
         public static ICreateEvent<TodoItemDomainEvent> New(string Title)
         {
-            TodoItemKey newId = TodoItemKey.New();
+            TodoItemKey newId = TodoItemKey.Format.New();
             return new TodoItemCreated(newId, Title).AsNewAggregate();
         }
 

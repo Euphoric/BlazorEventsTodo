@@ -40,7 +40,7 @@ namespace BlazorEventsTodo.Todo
         public async Task Delete(string id)
         {
             var itemId = new EntityId(id);
-            TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
+            TodoItemKey aggregateKey = TodoItemKey.Format.Parse(itemId.Value);
             var aggregate = await _eventStore.RetrieveAggregate(aggregateKey);
             var evnt = aggregate.Delete();
             await _eventStore.Store(evnt);
@@ -52,7 +52,7 @@ namespace BlazorEventsTodo.Todo
             try
             {
                 var itemId = new EntityId(id);
-                TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
+                TodoItemKey aggregateKey = TodoItemKey.Format.Parse(itemId.Value);
                 var aggregate = await _eventStore.RetrieveAggregate(aggregateKey);
                 var evnt = aggregate.Finish();
                 await _eventStore.Store(evnt);
@@ -71,7 +71,7 @@ namespace BlazorEventsTodo.Todo
             try
             {
                 var itemId = new EntityId(id);
-                TodoItemKey aggregateKey = TodoItemKey.Parse(itemId.Value);
+                TodoItemKey aggregateKey = TodoItemKey.Format.Parse(itemId.Value);
                 var aggregate = await _eventStore.RetrieveAggregate(aggregateKey);
                 var evnt = aggregate.Start();
                 await _eventStore.Store(evnt);
