@@ -9,8 +9,16 @@ namespace BlazorEventsTodo.EventStorage
     {
         public Task Store(ICreateEvent<IDomainEventData> eventData);
 
-        IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey)
-            where TEvent : IDomainEventData;
+        IAsyncEnumerable<IDomainEvent<IDomainEventData>> GetAggregateEvents(string aggregateKey);
+    }
+
+    public static class EventStoreExtensions
+    {
+        public static IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(this IEventStore eventStore, string aggregateKey)
+            where TEvent : IDomainEventData
+        {
+            return eventStore.GetAggregateEvents(aggregateKey).Cast<IDomainEvent<TEvent>>();
+        }
     }
 
     public class EventStore : IEventStore
@@ -27,9 +35,9 @@ namespace BlazorEventsTodo.EventStorage
             _clock = clock;
         }
 
-        public IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey) where TEvent : IDomainEventData
+        public IAsyncEnumerable<IDomainEvent<IDomainEventData>> GetAggregateEvents(string aggregateKey)
         {
-            return _events.OfType<IDomainEvent<TEvent>>().Where(x => x.AggregateKey == aggregateKey).ToAsyncEnumerable();
+            return _events.Where(x => x.AggregateKey == aggregateKey).ToAsyncEnumerable();
         }
 
         public Task Store(ICreateEvent<IDomainEventData> newEvent)

@@ -117,11 +117,11 @@ namespace BlazorEventsTodo.EventStorage
             return @event;
         }
 
-        public IAsyncEnumerable<IDomainEvent<TEvent>> GetAggregateEvents<TEvent>(string aggregateKey) where TEvent : IDomainEventData
+        public IAsyncEnumerable<IDomainEvent<IDomainEventData>> GetAggregateEvents(string aggregateKey)
         {
             var events = _client.ReadStreamAsync(Direction.Forwards, aggregateKey, StreamPosition.Start);
 
-            return events.Select(ParseEvent).Cast<IDomainEvent<TEvent>>();
+            return events.Select(ParseEvent);
         }
     }
 }
