@@ -37,21 +37,19 @@ namespace BlazorEventsTodo.Todo
         }
 
         [HttpDelete("{id}")]
-        public async Task Delete(string id)
+        public async Task Delete(EntityId id)
         {
-            var itemId = new EntityId(id);
-            var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)itemId);
+            var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)id);
             var evnt = aggregate.Delete();
             await _eventStore.Store(evnt);
         }
 
         [HttpPost("{id}/finish")]
-        public async Task<IActionResult> Finish(string id)
+        public async Task<IActionResult> Finish(EntityId id)
         {
             try
             {
-                var itemId = new EntityId(id);
-                var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)itemId);
+                var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)id);
                 var evnt = aggregate.Finish();
                 await _eventStore.Store(evnt);
             }
@@ -64,12 +62,11 @@ namespace BlazorEventsTodo.Todo
         }
 
         [HttpPost("{id}/start")]
-        public async Task<IActionResult> Start(string id)
+        public async Task<IActionResult> Start(EntityId id)
         {
             try
             {
-                var itemId = new EntityId(id);
-                var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)itemId);
+                var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)id);
                 var evnt = aggregate.Start();
                 await _eventStore.Store(evnt);
             }
