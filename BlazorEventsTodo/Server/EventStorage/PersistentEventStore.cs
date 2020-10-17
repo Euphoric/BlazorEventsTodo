@@ -53,7 +53,7 @@ namespace BlazorEventsTodo.EventStorage
             return new EventStoreClient(settings);
         }
 
-        public async Task Store(ICreateEvent<IDomainEventData> newEvent)
+        public async Task<IDomainEvent<IDomainEventData>> Store(ICreateEvent<IDomainEventData> newEvent)
         {
             var eventData = newEvent.Data;
 
@@ -80,6 +80,8 @@ namespace BlazorEventsTodo.EventStorage
                 result = await _client.AppendToStreamAsync(eventStream, StreamState.StreamExists, new List<EventData>() { evt });
             }
             _logger.LogDebug("Appended event {position}|{type}.", result.LogPosition, evt.Type);
+
+            return _eventFactory.CreateEvent(result.NextExpectedStreamRevision.ToUInt64(), SystemClock.Instance.GetCurrentInstant(),eventData);
         }
 
         private Task HandleNewEvent(StreamSubscription subscription, ResolvedEvent evnt, CancellationToken token)

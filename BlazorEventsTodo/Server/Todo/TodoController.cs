@@ -32,8 +32,9 @@ namespace BlazorEventsTodo.Todo
         public async Task<EntityId> Post(CreateTodo create)
         {
             var evnt = TodoItemAggregate.New(create.Title);
-            await _eventStore.Store(evnt);
-            return evnt.Data.Id;
+            var storedEvent = await _eventStore.Store(evnt);
+            var aggregate = AggregateBuilder<TodoItemAggregate>.Rehydrate(new [] { storedEvent });
+            return aggregate.Id;
         }
 
         [HttpDelete("{id}")]
@@ -41,7 +42,8 @@ namespace BlazorEventsTodo.Todo
         {
             var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)id);
             var evnt = aggregate.Delete();
-            await _eventStore.Store(evnt);
+            var storedEvent = await _eventStore.Store(evnt);
+            aggregate = aggregate.Update(new [] {storedEvent });
         }
 
         [HttpPost("{id}/finish")]
@@ -51,7 +53,8 @@ namespace BlazorEventsTodo.Todo
             {
                 var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)id);
                 var evnt = aggregate.Finish();
-                await _eventStore.Store(evnt);
+                var storedEvent = await _eventStore.Store(evnt);
+                aggregate = aggregate.Update(new [] {storedEvent });
             }
             catch (AggregateChangeException ex)
             {
@@ -68,7 +71,8 @@ namespace BlazorEventsTodo.Todo
             {
                 var aggregate = await _eventStore.RetrieveAggregate((TodoItemKey)id);
                 var evnt = aggregate.Start();
-                await _eventStore.Store(evnt);
+                var storedEvent = await _eventStore.Store(evnt);
+                aggregate = aggregate.Update(new [] {storedEvent });
             }
             catch (AggregateChangeException ex)
             {

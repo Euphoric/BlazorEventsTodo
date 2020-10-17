@@ -26,7 +26,12 @@ namespace BlazorEventsTodo.EventStorage
             }
         }
 
-        public TAggregate Aggregate = null;
+        public AggregateBuilder(TAggregate aggregate)
+        {
+            Aggregate = aggregate;
+        }
+
+        public TAggregate Aggregate {get; private set; } = null;
 
         public AggregateBuilder<TAggregate> Apply(IDomainEvent<IDomainEventData> evnt)
         {
@@ -50,9 +55,23 @@ namespace BlazorEventsTodo.EventStorage
             return events.Aggregate(this, (builder, evnt) => builder.Apply(evnt));
         }
 
+        public static TAggregate Update(TAggregate aggregate, IEnumerable<IDomainEvent<IDomainEventData>> events)
+        {
+            return new AggregateBuilder<TAggregate>(aggregate).Apply(events).Aggregate;
+        }
+
         public static TAggregate Rehydrate(IEnumerable<IDomainEvent<IDomainEventData>> events)
         {
-            return new AggregateBuilder<TAggregate>().Apply(events).Aggregate;
+            return Update(null, events);
+        }
+    }
+
+    public static class AggregateBuilderExtensions
+    {
+        public static TAggregate Update<TAggregate>(this TAggregate aggregate, IEnumerable<IDomainEvent<IDomainEventData>> events)
+            where TAggregate : Aggregate
+        {
+            return AggregateBuilder<TAggregate>.Update(aggregate, events);
         }
     }
 }

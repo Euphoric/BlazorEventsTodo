@@ -7,7 +7,7 @@ namespace BlazorEventsTodo.EventStorage
 {
     public interface IEventStore
     {
-        public Task Store(ICreateEvent<IDomainEventData> eventData);
+        public Task<IDomainEvent<IDomainEventData>> Store(ICreateEvent<IDomainEventData> eventData);
 
         IAsyncEnumerable<IDomainEvent<IDomainEventData>> GetAggregateEvents(string aggregateKey);
     }
@@ -48,7 +48,7 @@ namespace BlazorEventsTodo.EventStorage
             return _events.Where(x => x.AggregateKey == aggregateKey).ToAsyncEnumerable();
         }
 
-        public Task Store(ICreateEvent<IDomainEventData> newEvent)
+        public Task<IDomainEvent<IDomainEventData>> Store(ICreateEvent<IDomainEventData> newEvent)
         {
             var eventData = newEvent.Data;
             var eventVersion = _events.Where(x => x.AggregateKey == eventData.GetAggregateKey()).Select(x => (ulong?)x.Version).Max(x => x) ?? 0;
@@ -58,7 +58,8 @@ namespace BlazorEventsTodo.EventStorage
             _events.Add(@event);
             _sender.SendEvent(@event);
 
-            return Task.CompletedTask;
+            var result = _eventFactory.CreateEvent(eventVersion, created, eventData);
+            return Task.FromResult(result);
         }
     }
 }
