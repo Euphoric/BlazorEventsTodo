@@ -10,6 +10,6 @@ namespace BlazorEventsTodo.Todo
         public string Value => Format.ToValue(id);
 
         public static implicit operator EntityId(TodoItemKey key) => new EntityId(key.Value);
-        public static explicit operator TodoItemKey(EntityId id) => Format.Parse(id.Value);
+        public static implicit operator TodoItemKey(EntityId id) => Format.Parse(id.Value);
     }
 }
